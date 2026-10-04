@@ -95,6 +95,7 @@
                                                     <span>No. HP: {{ $profile->phone }}</span>
                                                 @endif
                                                 @unless (auth()->user()->is($user))
+                                                    <button class="button button-secondary" type="button" data-reset-password="{{ route('api.admin.users.reset-password', $user) }}" data-user-email="{{ $user->email }}">Reset password</button>
                                                     <button
                                                         class="button button-danger admin-user-delete"
                                                         type="button"

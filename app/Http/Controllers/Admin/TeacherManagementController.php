@@ -10,7 +10,9 @@ use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class TeacherManagementController extends Controller
@@ -61,6 +63,21 @@ class TeacherManagementController extends Controller
         return response()->json([
             'message' => 'Alamat email user berhasil diverifikasi.',
         ]);
+    }
+
+    public function resetPassword(Request $request, User $user): JsonResponse
+    {
+        if ($request->user()->is($user)) {
+            return response()->json(['message' => 'Gunakan menu Password untuk mengganti password akunmu sendiri.'], 409);
+        }
+
+        $user->forceFill(['password' => Hash::make('password'), 'remember_token' => Str::random(60)])->save();
+
+        if (Schema::hasTable('sessions')) {
+            DB::table('sessions')->where('user_id', $user->id)->delete();
+        }
+
+        return response()->json(['message' => 'Password user berhasil direset menjadi "password". Minta user menggantinya setelah masuk.']);
     }
 
     public function destroyUser(Request $request, User $user): JsonResponse

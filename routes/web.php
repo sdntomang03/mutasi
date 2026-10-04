@@ -21,6 +21,7 @@ Route::get('/', function () {
         ? redirect()->route('admin.users')
         : redirect()->route('dashboard');
 })->name('welcome');
+Route::middleware('auth')->get('/akun/password', fn () => view('account-password'))->name('account.password');
 Route::redirect('/admin/login', '/login')->name('admin.login');
 
 Route::middleware(['auth', 'verified', 'role:guru'])->group(function () {
@@ -50,6 +51,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
 Route::middleware(['auth', 'role:admin'])->prefix('api/admin')->name('api.admin.')->group(function () {
     Route::get('/districts', [SudinController::class, 'allDistricts']);
+    Route::patch('/users/{user}/reset-password', [TeacherManagementController::class, 'resetPassword'])->name('users.reset-password');
     Route::get('/sudins', [SudinController::class, 'index']);
     Route::post('/sudins', [SudinController::class, 'store']);
     Route::put('/sudins/{sudin}', [SudinController::class, 'update']);

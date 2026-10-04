@@ -32,8 +32,9 @@
         const reviewButton = event.target.closest('[data-review-deletion]');
         const verifyEmailButton = event.target.closest('[data-verify-user-email]');
         const deleteUserButton = event.target.closest('[data-delete-user]');
+        const resetPasswordButton = event.target.closest('[data-reset-password]');
         const matchButton = event.target.closest('[data-match-action]');
-        const button = statusButton || reviewButton || verifyEmailButton || deleteUserButton || matchButton;
+        const button = statusButton || reviewButton || verifyEmailButton || deleteUserButton || resetPasswordButton || matchButton;
         if (!button) return;
 
         button.disabled = true;
@@ -46,6 +47,15 @@
                 });
             } else if (verifyEmailButton) {
                 result = await request(verifyEmailButton.dataset.verifyUserEmail, 'PATCH', {});
+            } else if (resetPasswordButton) {
+                if (!window.confirm(`Reset password ${resetPasswordButton.dataset.userEmail} menjadi "password"?`)) {
+                    button.disabled = false;
+                    return;
+                }
+                result = await request(resetPasswordButton.dataset.resetPassword, 'PATCH', {});
+                showToast(result.message);
+                resetPasswordButton.disabled = false;
+                return;
             } else if (matchButton) {
                 showToast('Mengirim email, mohon tunggu...');
                 result = await request(matchButton.dataset.url, 'POST', {});

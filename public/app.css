@@ -563,3 +563,58 @@ body.modal-open { overflow: hidden; }
 .teacher-detail dt { margin-top: 9px; color: #8a9a94; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
 .teacher-detail dd { margin: 2px 0 0; font-size: 13px; line-height: 1.45; }
 @media (max-width: 700px) { .dt-filters { grid-template-columns: 1fr; } .dt-filter-arrow { display: none; } .dt-reset { grid-column: auto; grid-row: auto; justify-self: stretch; } .teacher-detail-grid { grid-template-columns: 1fr; } }
+
+/* Navbar aplikasi */
+.app-topbar { position: sticky; top: 0; z-index: 40; gap: 18px; background: rgba(255,255,255,.92); backdrop-filter: blur(10px); }
+.app-topbar .app-navigation { flex: 1; justify-content: center; margin: 0; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+.app-topbar .app-navigation::-webkit-scrollbar { display: none; }
+.app-topbar .nav-link { position: relative; white-space: nowrap; padding: 10px 13px; font-size: 13px; transition: color .15s, background .15s; }
+.app-topbar .nav-link-active::after { content: ''; position: absolute; left: 13px; right: 13px; bottom: -14px; height: 2px; border-radius: 2px; background: var(--green); }
+.account-menu { position: relative; }
+.account-menu summary { display: flex; align-items: center; gap: 10px; padding: 5px 10px 5px 5px; border: 1px solid var(--line); border-radius: 999px; background: #fff; cursor: pointer; list-style: none; }
+.account-menu summary::-webkit-details-marker { display: none; }
+.account-menu summary:hover, .account-menu[open] summary { border-color: #b9d6c6; background: #f4faf6; }
+.account-avatar { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; background: var(--green); color: #fff; font: 800 13px 'Manrope', sans-serif; }
+.account-info { display: grid; gap: 1px; max-width: 150px; line-height: 1.2; }
+.account-info strong { overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); }
+.account-info small { color: var(--muted); font-size: 10px; }
+.account-caret { color: #7c8c87; transition: transform .15s; }
+.account-menu[open] .account-caret { transform: rotate(180deg); }
+.account-dropdown { position: absolute; right: 0; top: calc(100% + 8px); z-index: 50; width: 235px; padding: 7px; border: 1px solid var(--line); border-radius: 14px; background: #fff; box-shadow: 0 16px 38px rgba(25,55,45,.16); }
+.account-dropdown-head { display: grid; gap: 2px; padding: 9px 10px 11px; margin-bottom: 5px; border-bottom: 1px solid var(--line); }
+.account-dropdown-head strong { font-size: 13px; }
+.account-dropdown-head small { overflow: hidden; color: var(--muted); font-size: 11px; text-overflow: ellipsis; }
+.account-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px; border: 0; border-radius: 9px; background: transparent; color: #3d5650; font: 600 13px 'DM Sans', sans-serif; text-align: left; text-decoration: none; cursor: pointer; }
+.account-item:hover, .account-item-active { background: #eaf4ee; color: var(--green-dark); }
+.account-item-danger:hover { background: #fbeceb; color: #a04e43; }
+
+/* Halaman ganti password */
+.password-layout { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(250px, 1fr); gap: 20px; align-items: start; }
+.password-panel { padding: 26px; }
+.password-panel .field { margin-bottom: 18px; gap: 7px; font-size: 12px; }
+.password-input { position: relative; }
+.password-input input { padding-right: 84px; }
+.password-input input.is-invalid { border-color: #d98c82; background: #fffafa; }
+.password-toggle { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); padding: 6px 10px; border: 0; border-radius: 7px; background: transparent; color: var(--green-dark); font: 700 11px 'DM Sans', sans-serif; cursor: pointer; }
+.password-toggle:hover { background: #eaf4ee; }
+.password-panel .form-error { color: var(--red); font-size: 11px; font-weight: 500; }
+.password-panel .form-success { margin: 0 0 18px; padding: 11px 14px; border: 1px solid #cfe6d8; border-radius: 10px; background: #eff7f1; color: var(--green-dark); font-size: 13px; font-weight: 600; }
+.password-panel .form-actions { margin-top: 6px; }
+.password-tips { padding: 24px; background: #f6faf7; }
+.password-tips h2 { margin: 0 0 14px; font: 800 16px 'Manrope', sans-serif; letter-spacing: -.03em; }
+.password-tips ul { margin: 0; padding-left: 18px; display: grid; gap: 10px; color: #566a64; font-size: 13px; line-height: 1.55; }
+.password-tips code { padding: 1px 6px; border-radius: 5px; background: #e4eee8; font-size: 12px; }
+
+@media (max-width: 860px) {
+    .password-layout { grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) {
+    .app-topbar { flex-wrap: wrap; padding: 10px 0 0; }
+    .app-topbar .brand { order: 1; }
+    .app-topbar .account-menu { order: 2; margin-left: auto; }
+    .app-topbar .app-navigation { order: 3; flex: 0 0 100%; justify-content: flex-start; margin: 4px 0 0; padding: 4px 0 8px; border-top: 1px solid var(--line); }
+    .app-topbar .nav-link { flex: 0 0 auto; font-size: 12px; }
+    .app-topbar .nav-link-active::after { bottom: -2px; }
+    .account-info, .account-caret { display: none; }
+    .account-menu summary { padding: 3px; }
+}
