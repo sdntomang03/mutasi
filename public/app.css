@@ -502,3 +502,8 @@ a.admin-pagination-link:hover { border-color: #b9d5c3; color: var(--green-dark);
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 @media (max-width: 860px) { .subject-layout { grid-template-columns: 1fr; } .subject-list { max-height: none; } }
 @media (max-width: 480px) { .subject-tools, .subject-list-panel { padding: 19px 14px; } .subject-row { grid-template-columns: 1fr 1fr; } .subject-row input { grid-column: 1 / -1; } }
+.unofficial-notice { width: min(1180px, calc(100% - 48px)); margin: 0 auto 24px; padding: 10px 14px; border: 1px dashed #d7c79a; border-radius: 10px; background: #fffaf0; color: #7a6736; font-size: 11px; line-height: 1.6; text-align: center; }
+.unofficial-notice strong { color: #5f4f1f; }
+.auth-main .unofficial-notice { width: 100%; max-width: 440px; margin: 16px auto 0; }
+.welcome-shell .unofficial-notice, .page-shell + .unofficial-notice { margin-top: 8px; }
+@media (max-width: 720px) { .unofficial-notice { width: min(100% - 28px, 500px); font-size: 10px; } }

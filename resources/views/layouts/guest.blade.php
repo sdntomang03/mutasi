@@ -43,6 +43,7 @@
             <div class="auth-card">
                 {{ $slot }}
             </div>
+            @include('partials.unofficial-notice')
             <p class="auth-footer"><a href="{{ route('welcome') }}">← Kembali ke beranda</a></p>
         </section>
     </main>

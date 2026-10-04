@@ -9,6 +9,7 @@
 </head>
 <body>
     @yield('content')
+    @include('partials.unofficial-notice')
     @stack('scripts')
 </body>
 </html>

@@ -87,6 +87,12 @@
             </section>
 
             <section class="panel guide-card guide-wide">
+                <p class="eyebrow">TENTANG APLIKASI</p>
+                <h2>Aplikasi unofficial</h2>
+                <p>Ruang Tukar Guru dibuat <strong>secara mandiri dan swakarsa</strong>. Aplikasi ini <strong>bukan layanan resmi</strong> Dinas Pendidikan, Sudin, maupun instansi pemerintah lainnya. Hasil pencocokan hanya membantu mempertemukan calon tukeran; proses dan keputusan mutasi tetap mengikuti ketentuan resmi yang berlaku.</p>
+            </section>
+
+            <section class="panel guide-card guide-wide">
                 <p class="eyebrow">PRIVASI</p>
                 <h2>Data yang dibagikan</h2>
                 <p>Data profilmu hanya ditampilkan kepada guru yang cocok dua arah dan kepada admin. Gunakan nomor HP yang aktif agar calon tukeran dapat menghubungimu.</p>

@@ -73,6 +73,7 @@
             <span>Ruang Tukar Guru · DKI Jakarta</span>
             <span>Berbagi informasi, membuka kemungkinan.</span>
         </footer>
+        @include('partials.unofficial-notice')
     </div>
 </body>
 </html>
