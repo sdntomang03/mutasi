@@ -36,7 +36,7 @@ class TeacherDirectoryController extends Controller
             'position' => $position,
             'positionLabel' => $position ? TeacherProfile::POSITIONS[$position] : null,
             'teachers' => $teachers,
-            'sudins' => Sudin::query()->orderBy('name')->get(['id', 'name', 'abbreviation']),
+            'sudins' => Sudin::query()->orderBy('abbreviation')->orderBy('name')->get(['id', 'name', 'abbreviation']),
         ]);
     }
 }

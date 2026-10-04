@@ -14,7 +14,7 @@ class SudinController extends Controller
     public function publicIndex(): JsonResponse
     {
         return response()->json([
-            'data' => Sudin::query()->orderBy('name')->get(['id', 'name', 'abbreviation']),
+            'data' => Sudin::query()->orderBy('abbreviation')->orderBy('name')->get(['id', 'name', 'abbreviation']),
         ]);
     }
 
@@ -44,6 +44,7 @@ class SudinController extends Controller
             'data' => Sudin::query()
                 ->with('districts:code,name,regency_code,regency_name')
                 ->withCount('teacherProfiles')
+                ->orderBy('abbreviation')
                 ->orderBy('name')
                 ->get(),
         ]);
