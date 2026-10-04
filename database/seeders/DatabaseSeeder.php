@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
 
         if (app()->environment(['local', 'testing'])) {
             $this->call([
+                AdminUserSeeder::class,
                 DkiDistrictSeeder::class,
                 DkiSudinSeeder::class,
                 // FakeTeachersSeeder::class,
