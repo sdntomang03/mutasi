@@ -47,6 +47,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 });
 
 Route::middleware(['auth', 'role:admin'])->prefix('api/admin')->name('api.admin.')->group(function () {
+    Route::get('/districts', [SudinController::class, 'allDistricts']);
     Route::get('/sudins', [SudinController::class, 'index']);
     Route::post('/sudins', [SudinController::class, 'store']);
     Route::put('/sudins/{sudin}', [SudinController::class, 'update']);

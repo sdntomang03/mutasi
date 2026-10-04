@@ -46,6 +46,16 @@
     }
 
     async function loadDistricts() {
+        try {
+            const local = await request('/api/admin/districts');
+            if (local.data.length) {
+                districts = local.data;
+                renderDistricts();
+                return;
+            }
+        } catch (error) {
+            // lanjut ke sumber eksternal
+        }
         const regencies = await fetchWilayah('/regencies/31.json');
         const groups = await Promise.all(regencies.map(async (regency) => ({
             regency,
@@ -90,7 +100,7 @@
         }
         container.innerHTML = sudins.map((sudin) => `
             <article class="sudin-card">
-                <div class="sudin-card-heading"><div><h3>${sudin.abbreviation ? `<span class="sudin-abbr">${escapeHtml(sudin.abbreviation)}</span> ` : '}${escapeHtml(sudin.name)}</h3><span>${sudin.districts.length} kecamatan · ${sudin.teacher_profiles_count} profil guru</span></div><span class="sudin-card-mark">⌖</span></div>
+                <div class="sudin-card-heading"><div><h3>${sudin.abbreviation ? `<span class="sudin-abbr">${escapeHtml(sudin.abbreviation)}</span> ` : ""}${escapeHtml(sudin.name)}</h3><span>${sudin.districts.length} kecamatan · ${sudin.teacher_profiles_count} profil guru</span></div><span class="sudin-card-mark">⌖</span></div>
                 <p class="sudin-district-list">${sudin.districts.map((district) => `${escapeHtml(district.name)} <small>${escapeHtml(district.regency_name)}</small>`).join(' · ') || 'Belum ada kecamatan'}</p>
                 <div class="sudin-card-actions"><button type="button" class="text-button" data-edit="${sudin.id}">Ubah cakupan</button><button type="button" class="text-button text-danger" data-delete="${sudin.id}">Hapus</button></div>
             </article>`).join('');

@@ -28,6 +28,16 @@ class SudinController extends Controller
         ]);
     }
 
+    public function allDistricts(): JsonResponse
+    {
+        return response()->json([
+            'data' => District::query()
+                ->orderBy('regency_code')
+                ->orderBy('name')
+                ->get(['code', 'name', 'regency_code', 'regency_name']),
+        ]);
+    }
+
     public function index(): JsonResponse
     {
         return response()->json([
