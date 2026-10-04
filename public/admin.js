@@ -90,7 +90,7 @@
         }
         container.innerHTML = sudins.map((sudin) => `
             <article class="sudin-card">
-                <div class="sudin-card-heading"><div><h3>${escapeHtml(sudin.name)}</h3><span>${sudin.districts.length} kecamatan · ${sudin.teacher_profiles_count} profil guru</span></div><span class="sudin-card-mark">⌖</span></div>
+                <div class="sudin-card-heading"><div><h3>${sudin.abbreviation ? `<span class="sudin-abbr">${escapeHtml(sudin.abbreviation)}</span> ` : '}${escapeHtml(sudin.name)}</h3><span>${sudin.districts.length} kecamatan · ${sudin.teacher_profiles_count} profil guru</span></div><span class="sudin-card-mark">⌖</span></div>
                 <p class="sudin-district-list">${sudin.districts.map((district) => `${escapeHtml(district.name)} <small>${escapeHtml(district.regency_name)}</small>`).join(' · ') || 'Belum ada kecamatan'}</p>
                 <div class="sudin-card-actions"><button type="button" class="text-button" data-edit="${sudin.id}">Ubah cakupan</button><button type="button" class="text-button text-danger" data-delete="${sudin.id}">Hapus</button></div>
             </article>`).join('');
@@ -105,6 +105,7 @@
     function resetForm() {
         $('#sudin-id').value = '';
         $('#sudin-name').value = '';
+        $('#sudin-abbreviation').value = '';
         $('#sudin-form-title').textContent = 'Tambah Sudin';
         $('#cancel-sudin-edit').hidden = true;
         renderDistricts();
@@ -122,6 +123,7 @@
         }
         const payload = {
             name: $('#sudin-name').value.trim(),
+            abbreviation: $('#sudin-abbreviation').value.trim() || null,
             districts: districts.filter((district) => selectedCodes.has(district.code)),
         };
         const id = $('#sudin-id').value;
@@ -152,6 +154,7 @@
             if (!sudin) return;
             $('#sudin-id').value = sudin.id;
             $('#sudin-name').value = sudin.name;
+            $('#sudin-abbreviation').value = sudin.abbreviation || '';
             $('#sudin-form-title').textContent = 'Ubah cakupan Sudin';
             $('#cancel-sudin-edit').hidden = false;
             renderDistricts(new Set(sudin.districts.map((district) => district.code)));

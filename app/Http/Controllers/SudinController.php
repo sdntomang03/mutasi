@@ -14,14 +14,14 @@ class SudinController extends Controller
     public function publicIndex(): JsonResponse
     {
         return response()->json([
-            'data' => Sudin::query()->orderBy('name')->get(['id', 'name']),
+            'data' => Sudin::query()->orderBy('name')->get(['id', 'name', 'abbreviation']),
         ]);
     }
 
     public function districts(Sudin $sudin): JsonResponse
     {
         return response()->json([
-            'sudin' => ['id' => $sudin->id, 'name' => $sudin->name],
+            'sudin' => ['id' => $sudin->id, 'name' => $sudin->name, 'abbreviation' => $sudin->abbreviation],
             'data' => $sudin->districts()
                 ->orderBy('name')
                 ->get(['districts.code as id', 'districts.name', 'districts.regency_code', 'districts.regency_name']),
@@ -72,6 +72,7 @@ class SudinController extends Controller
     {
         return $request->validate([
             'name' => ['required', 'string', 'max:100', Rule::unique('sudins', 'name')->ignore($sudin?->id)],
+            'abbreviation' => ['nullable', 'string', 'max:20', Rule::unique('sudins', 'abbreviation')->ignore($sudin?->id)],
             'districts' => ['required', 'array', 'min:1'],
             'districts.*.code' => ['required', 'string', 'distinct', 'regex:/^31\.\d{2}\.\d{2}$/'],
             'districts.*.name' => ['required', 'string', 'max:120'],
@@ -91,6 +92,7 @@ class SudinController extends Controller
         }
 
         $sudin->name = $data['name'];
+        $sudin->abbreviation = filled($data['abbreviation'] ?? null) ? trim($data['abbreviation']) : null;
         $sudin->save();
 
         foreach ($data['districts'] as $district) {

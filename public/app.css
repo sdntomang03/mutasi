@@ -515,3 +515,4 @@ a.admin-pagination-link:hover { border-color: #b9d5c3; color: var(--green-dark);
 .level-option input[type="checkbox"] { width: 16px; height: 16px; min-height: 0; padding: 0; margin: 0; flex: 0 0 auto; accent-color: var(--green); }
 .level-option { font-weight: 600; line-height: 1.35; color: #263c40; }
 .level-option:has(input:checked) { border-color: var(--green); background: var(--mint); }
+.sudin-abbr { display: inline-block; margin-right: 6px; padding: 2px 8px; border-radius: 999px; background: var(--mint); color: var(--green); font-size: 12px; font-weight: 800; vertical-align: middle; }

@@ -14,6 +14,7 @@
                 <form id="sudin-form">
                     <input type="hidden" id="sudin-id">
                     <label class="field"><span>Nama Sudin</span><input id="sudin-name" required maxlength="100" placeholder="Contoh: Jakarta Barat 2"></label>
+                    <label class="field"><span>Singkatan</span><input id="sudin-abbreviation" maxlength="20" placeholder="Contoh: JB 2"></label>
                     <div class="district-select-heading"><div><h3>Pilih kecamatan</h3><p class="field-help">Pilih semua kecamatan dalam cakupan Sudin ini.</p></div><span class="fixed-pill" id="district-count">0 dipilih</span></div>
                     <div id="district-groups" class="district-groups"><div class="empty-state compact"><p>Memuat daftar kecamatan DKI Jakarta...</p></div></div>
                     <div class="form-actions"><button class="button button-primary" type="submit"><span>Simpan cakupan</span><span aria-hidden="true">→</span></button><button class="button button-ghost" id="cancel-sudin-edit" type="button" hidden>Batal</button></div>

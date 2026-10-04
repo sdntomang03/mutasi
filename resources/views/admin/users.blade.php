@@ -42,7 +42,7 @@
                         </div>
                         @if ($profile)
                         <div class="admin-user-meta">
-                            <span><small>Sudin asal</small>{{ $profile->sudin->name }}</span>
+                            <span><small>Sudin asal</small>{{ $profile->sudin->abbreviation ? $profile->sudin->abbreviation.' · ' : '' }}{{ $profile->sudin->name }}</span>
                             <span><small>Sudin tujuan</small>{{ $profile->destinationSudin?->name ?? 'Belum dipilih' }}</span>
                             <span><small>Jabatan · jenjang asal</small>{{ $profile->position ? \App\Models\TeacherProfile::POSITIONS[$profile->position].' · '.$profile->level.($profile->subject ? ' · '.$profile->subject->name : '') : 'Belum diisi' }}</span>
                             <span><small>Jabatan · jenjang tujuan</small>{{ $profile->destination_position ? \App\Models\TeacherProfile::POSITIONS[$profile->destination_position].' · '.$profile->destinationLevels->pluck('level')->join(', ').($profile->destination_position === 'guru_mapel' ? ' · '.$profile->destinationSubjects->pluck('name')->join(', ') : '') : 'Belum diisi' }}</span>

@@ -36,7 +36,7 @@
             </section>
         @else
             <section class="match-summary">
-                <div><span>Sudin asal</span><strong>{{ $profile->sudin?->name }}</strong></div>
+                <div><span>Sudin asal</span><strong>{{ $profile->sudin?->abbreviation ? $profile->sudin->abbreviation.' · ' : '' }}{{ $profile->sudin?->name }}</strong></div>
                 <span class="summary-arrow" aria-hidden="true">↔</span>
                 <div><span>Sudin tujuan</span><strong>{{ $profile->destinationSudin?->name }}</strong></div>
                 <div><span>Jabatan · jenjang asal</span><strong>{{ \App\Models\TeacherProfile::POSITIONS[$profile->position] }} · {{ $profile->level }}{{ $profile->subject ? ' · '.$profile->subject->name : '' }}</strong></div>
@@ -78,7 +78,7 @@
                                     <div><p class="eyebrow">COCOK DUA ARAH</p><h3>{{ $candidate->name }}</h3></div>
                                     <span class="type-pill">{{ $candidate->employment_type }}</span>
                                 </div>
-                                <p class="match-school">{{ $candidate->school_name }} <span>·</span> {{ $candidate->sudin->name }}</p>
+                                <p class="match-school">{{ $candidate->school_name }} <span>·</span> {{ $candidate->sudin->abbreviation ?: $candidate->sudin->name }}</p>
                                 <div class="match-facts">
                                     <p><span>Jabatan · jenjang</span>{{ \App\Models\TeacherProfile::POSITIONS[$candidate->position] }} · {{ $candidate->level }}{{ $candidate->subject ? ' · '.$candidate->subject->name : '' }}</p>
                                     <p><span>Mencari</span>{{ \App\Models\TeacherProfile::POSITIONS[$candidate->destination_position] }} · {{ $candidate->destinationLevels->pluck('level')->join(', ') }}{{ $candidate->destination_position === 'guru_mapel' ? ' · '.$candidate->destinationSubjects->pluck('name')->join(', ') : '' }}</p>
