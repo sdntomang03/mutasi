@@ -188,7 +188,7 @@ class TeacherExchangeTest extends TestCase
         );
         $this->actingAs($userB)->get($verificationUrl)
             ->assertRedirect(route('dashboard').'?verified=1');
-
+        $userB->refresh();
         $this->actingAs($userB)->postJson('/api/profile', $this->profilePayload(
             $sudinB,
             $originB,

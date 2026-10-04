@@ -3,29 +3,33 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Auth\Events\Verified;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 
 class VerifyEmailController extends Controller
 {
     /**
-     * Mark the authenticated user's email address as verified.
+     * Verifikasi email lewat tautan bertanda tangan tanpa mewajibkan login,
+     * agar tautan dari aplikasi email (mis. Gmail) langsung berfungsi.
      */
-    public function __invoke(EmailVerificationRequest $request): RedirectResponse
+    public function __invoke(Request $request, string $id, string $hash): RedirectResponse
     {
-        $destination = $request->user()->hasRole('admin')
-            ? route('admin.users', absolute: false)
-            : route('dashboard', absolute: false);
+        $user = User::query()->findOrFail($id);
 
-        if ($request->user()->hasVerifiedEmail()) {
-            return redirect()->intended($destination.'?verified=1');
+        abort_unless(hash_equals(sha1($user->getEmailForVerification()), $hash), 403);
+
+        if (! $user->hasVerifiedEmail() && $user->markEmailAsVerified()) {
+            event(new Verified($user));
         }
 
-        if ($request->user()->markEmailAsVerified()) {
-            event(new Verified($request->user()));
+        if ($request->user()?->is($user)) {
+            return redirect()->to(($user->hasRole('admin')
+                ? route('admin.users', absolute: false)
+                : route('dashboard', absolute: false)).'?verified=1');
         }
 
-        return redirect()->intended($destination.'?verified=1');
+        return redirect()->route('login')->with('status', 'Email berhasil diverifikasi. Silakan masuk.');
     }
 }

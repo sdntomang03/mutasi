@@ -70,4 +70,34 @@ class EmailVerificationTest extends TestCase
 
         $this->assertFalse($user->fresh()->hasVerifiedEmail());
     }
+
+    public function test_email_can_be_verified_from_a_link_opened_while_logged_out(): void
+    {
+        $user = User::factory()->unverified()->create();
+        $verificationUrl = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            ['id' => $user->id, 'hash' => sha1($user->email)]
+        );
+
+        $this->get($verificationUrl)->assertRedirect(route('login'));
+
+        $this->assertGuest();
+        $this->assertTrue($user->fresh()->hasVerifiedEmail());
+    }
+
+    public function test_logged_out_verification_link_rejects_invalid_hash_and_unsigned_urls(): void
+    {
+        $user = User::factory()->unverified()->create();
+        $badHash = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            ['id' => $user->id, 'hash' => sha1('wrong-email')]
+        );
+
+        $this->get($badHash)->assertForbidden();
+        $this->get(route('verification.verify', ['id' => $user->id, 'hash' => sha1($user->email)]))->assertForbidden();
+
+        $this->assertFalse($user->fresh()->hasVerifiedEmail());
+    }
 }
