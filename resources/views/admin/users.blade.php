@@ -64,5 +64,5 @@
     <footer class="footer"><span>Ruang Tukar Guru · Panel administrator</span><span>Pengajuan penghapusan ada di menu terpisah</span></footer>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="{{ asset('admin-users.js') }}" defer></script>
+<script src="{{ asset('admin-users.js').'?v='.filemtime(public_path('admin-users.js')) }}" defer></script>
 @endsection

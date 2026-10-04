@@ -10,6 +10,7 @@ use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 
 class TeacherManagementController extends Controller
@@ -79,8 +80,12 @@ class TeacherManagementController extends Controller
             }
 
             ProfileDeletionRequest::query()->where('requested_by', $user->id)->delete();
-            DB::table('sessions')->where('user_id', $user->id)->delete();
-            DB::table('password_reset_tokens')->where('email', $user->email)->delete();
+            if (Schema::hasTable('sessions')) {
+                DB::table('sessions')->where('user_id', $user->id)->delete();
+            }
+            if (Schema::hasTable('password_reset_tokens')) {
+                DB::table('password_reset_tokens')->where('email', $user->email)->delete();
+            }
 
             $user->forceDelete();
         });
