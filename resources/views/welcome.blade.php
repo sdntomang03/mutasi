@@ -408,8 +408,8 @@
                                 </div>
                             </div>
 
-                            <p class="mt-5 text-center text-xs text-slate-500">Ilustrasi simulasi. Ketuk tombol di
-                                tengah untuk menukar.</p>
+                            <p class="mt-5 text-center text-xs text-slate-500">Dari Asal ke Tujuan, Bersama Menemukan
+                                Jalan.</p>
                             <p id="swap-live" class="sr-only" aria-live="polite"></p>
                         </div>
                     </div>
