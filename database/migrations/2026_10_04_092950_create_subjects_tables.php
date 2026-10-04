@@ -37,9 +37,11 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('teacher_destination_subjects');
-        Schema::table('teacher_profiles', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('subject_id');
-        });
+        if (Schema::hasColumn('teacher_profiles', 'subject_id')) {
+            Schema::table('teacher_profiles', function (Blueprint $table) {
+                $table->dropConstrainedForeignId('subject_id');
+            });
+        }
         Schema::dropIfExists('subjects');
     }
 };
