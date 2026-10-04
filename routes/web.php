@@ -14,15 +14,9 @@ Route::get('/', function () {
 })->name('welcome');
 Route::redirect('/admin/login', '/login')->name('admin.login');
 
-Route::middleware(['auth', 'role:guru|admin'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:guru|admin'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::view('/teacher-profile', 'teacher-profile')->name('teacher-profile.edit');
-
-    Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
-        Route::view('/sudins', 'admin.sudins')->name('sudins');
-        Route::get('/users', [TeacherManagementController::class, 'index'])->name('users');
-        Route::get('/deletion-requests', [TeacherManagementController::class, 'deletionRequests'])->name('deletion-requests');
-    });
 
     Route::prefix('api')->group(function () {
         Route::get('/sudins', [SudinController::class, 'publicIndex']);
@@ -32,18 +26,26 @@ Route::middleware(['auth', 'role:guru|admin'])->group(function () {
         Route::get('/matches', [MatchController::class, 'index'])->middleware('throttle:30,1');
         Route::patch('/teacher-profile/status', [TeacherLifecycleController::class, 'updateStatus']);
         Route::post('/teacher-profile/deletion-request', [TeacherLifecycleController::class, 'requestDeletion']);
-
-        Route::prefix('admin')->name('api.admin.')->middleware('role:admin')->group(function () {
-            Route::get('/sudins', [SudinController::class, 'index']);
-            Route::post('/sudins', [SudinController::class, 'store']);
-            Route::put('/sudins/{sudin}', [SudinController::class, 'update']);
-            Route::delete('/sudins/{sudin}', [SudinController::class, 'destroy']);
-            Route::patch('/teachers/{teacherProfile}/status', [TeacherManagementController::class, 'updateStatus'])
-                ->name('teachers.status');
-            Route::post('/profile-deletion-requests/{deletionRequest}/review', [TeacherManagementController::class, 'reviewDeletion'])
-                ->name('profile-deletion-requests.review');
-        });
     });
+});
+
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::view('/sudins', 'admin.sudins')->name('sudins');
+    Route::get('/users', [TeacherManagementController::class, 'index'])->name('users');
+    Route::get('/deletion-requests', [TeacherManagementController::class, 'deletionRequests'])->name('deletion-requests');
+});
+
+Route::middleware(['auth', 'role:admin'])->prefix('api/admin')->name('api.admin.')->group(function () {
+    Route::get('/sudins', [SudinController::class, 'index']);
+    Route::post('/sudins', [SudinController::class, 'store']);
+    Route::put('/sudins/{sudin}', [SudinController::class, 'update']);
+    Route::delete('/sudins/{sudin}', [SudinController::class, 'destroy']);
+    Route::patch('/users/{user}/verify-email', [TeacherManagementController::class, 'verifyEmail'])
+        ->name('users.verify-email');
+    Route::patch('/teachers/{teacherProfile}/status', [TeacherManagementController::class, 'updateStatus'])
+        ->name('teachers.status');
+    Route::post('/profile-deletion-requests/{deletionRequest}/review', [TeacherManagementController::class, 'reviewDeletion'])
+        ->name('profile-deletion-requests.review');
 });
 
 Route::middleware('auth')->group(function () {

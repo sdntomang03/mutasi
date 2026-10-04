@@ -17,7 +17,7 @@ class ReciprocalMatchFinder
         return TeacherProfile::query()
             ->with(['sudin:id,name', 'destinationSudin:id,name', 'destinationDistricts:code,name,regency_code,regency_name', 'user:id,email'])
             ->whereNotNull('user_id')
-            ->whereHas('user')
+            ->whereHas('user', fn ($user) => $user->whereNotNull('email_verified_at'))
             ->where('user_id', '!=', $profile->user_id)
             ->where('is_mutated', false)
             ->whereDoesntHave('deletionRequests', fn ($query) => $query->where('status', 'pending'))

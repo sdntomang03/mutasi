@@ -22,6 +22,14 @@
                         <div class="admin-user-identity">
                             <h3>{{ $profile?->name ?? $user->name }}</h3>
                             <p>{{ $user->email }}</p>
+                            <div class="admin-email-verification">
+                                @if ($user->hasVerifiedEmail())
+                                    <span class="email-verification-status is-verified">Email terverifikasi</span>
+                                @else
+                                    <span class="email-verification-status is-unverified">Email belum terverifikasi</span>
+                                    <button class="button button-secondary" type="button" data-verify-user-email="{{ route('api.admin.users.verify-email', $user) }}">Verifikasi email user</button>
+                                @endif
+                            </div>
                             <span>{{ $profile ? $profile->school_name.' · '.$profile->district_name : 'Profil guru belum dibuat' }}</span>
                         </div>
                         @if ($profile)

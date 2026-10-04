@@ -30,7 +30,8 @@
     document.addEventListener('click', async (event) => {
         const statusButton = event.target.closest('[data-save-admin-status]');
         const reviewButton = event.target.closest('[data-review-deletion]');
-        const button = statusButton || reviewButton;
+        const verifyEmailButton = event.target.closest('[data-verify-user-email]');
+        const button = statusButton || reviewButton || verifyEmailButton;
         if (!button) return;
 
         button.disabled = true;
@@ -41,6 +42,8 @@
                 result = await request(statusButton.dataset.saveAdminStatus, 'PATCH', {
                     is_mutated: card.querySelector('[data-admin-mutation-status]').value === '1',
                 });
+            } else if (verifyEmailButton) {
+                result = await request(verifyEmailButton.dataset.verifyUserEmail, 'PATCH', {});
             } else {
                 const decision = reviewButton.dataset.reviewDeletion;
                 const confirmation = decision === 'approve'

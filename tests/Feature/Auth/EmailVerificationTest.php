@@ -22,6 +22,21 @@ class EmailVerificationTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function test_unverified_users_cannot_access_teacher_features_until_verifying_email(): void
+    {
+        $user = User::factory()->unverified()->create();
+
+        $this->actingAs($user)->get('/dashboard')
+            ->assertRedirect(route('verification.notice'));
+        $this->actingAs($user)->get('/teacher-profile')
+            ->assertRedirect(route('verification.notice'));
+        $this->actingAs($user)->getJson('/api/matches')
+            ->assertForbidden();
+        $this->actingAs($user)->get('/verify-email')
+            ->assertOk()
+            ->assertSee('Verifikasi emailmu');
+    }
+
     public function test_email_can_be_verified(): void
     {
         $user = User::factory()->unverified()->create();

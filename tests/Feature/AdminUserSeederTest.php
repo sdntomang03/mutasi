@@ -16,7 +16,7 @@ class AdminUserSeederTest extends TestCase
     {
         $this->seed(AdminUserSeeder::class);
 
-        $admin = User::query()->where('email', 'admin@example.com')->firstOrFail();
+        $admin = User::query()->where('email', 'admin@admin.com')->firstOrFail();
 
         $this->assertSame('Administrator', $admin->name);
         $this->assertTrue(Hash::check('password', $admin->password));
@@ -27,7 +27,7 @@ class AdminUserSeederTest extends TestCase
     {
         $this->seed(AdminUserSeeder::class);
 
-        $admin = User::query()->where('email', 'admin@example.com')->firstOrFail();
+        $admin = User::query()->where('email', 'admin@admin.com')->firstOrFail();
         $admin->update(['password' => 'changed-password']);
         $admin->syncRoles([]);
 

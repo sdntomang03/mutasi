@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ProfileDeletionRequest;
 use App\Models\TeacherProfile;
 use App\Models\User;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -35,6 +36,25 @@ class TeacherManagementController extends Controller
                 ->with(['profile:id,user_id,name,phone,school_name,is_mutated', 'requester:id,name,email'])
                 ->orderBy('created_at')
                 ->paginate(20),
+        ]);
+    }
+
+    public function verifyEmail(User $user): JsonResponse
+    {
+        if ($user->hasVerifiedEmail()) {
+            return response()->json([
+                'message' => 'Alamat email user ini sudah terverifikasi.',
+            ]);
+        }
+
+        if (! $user->markEmailAsVerified()) {
+            abort(500, 'Alamat email user tidak berhasil diverifikasi.');
+        }
+
+        event(new Verified($user));
+
+        return response()->json([
+            'message' => 'Alamat email user berhasil diverifikasi.',
         ]);
     }
 

@@ -11,6 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -178,6 +179,14 @@ class TeacherExchangeTest extends TestCase
         ])->assertRedirect('/dashboard');
         $userB = User::query()->where('email', 'guru-b@example.test')->firstOrFail();
         $this->assertAuthenticatedAs($userB);
+
+        $verificationUrl = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            ['id' => $userB->id, 'hash' => sha1($userB->email)],
+        );
+        $this->actingAs($userB)->get($verificationUrl)
+            ->assertRedirect(route('dashboard', absolute: false).'?verified=1');
 
         $this->actingAs($userB)->postJson('/api/profile', $this->profilePayload(
             $sudinB,
@@ -441,6 +450,34 @@ class TeacherExchangeTest extends TestCase
         $this->actingAs($userC)->getJson('/api/matches?profile_id='.$userA->teacherProfile->id)
             ->assertUnprocessable()
             ->assertJsonPath('message', 'Simpan profil guru terlebih dahulu untuk mencari tukeran.');
+    }
+
+    public function test_unverified_users_are_excluded_from_reciprocal_matches(): void
+    {
+        $origin = $this->district('31.71.01', 'Kecamatan A', '31.71', 'Kota Administrasi Jakarta Pusat');
+        $destination = $this->district('31.72.01', 'Kecamatan B', '31.72', 'Kota Administrasi Jakarta Utara');
+        $originSudin = $this->sudinFor($origin, 'Jakarta Pusat 1');
+        $destinationSudin = $this->sudinFor($destination, 'Jakarta Utara 1');
+        $verifiedTeacher = $this->teacherUser('verified@example.test');
+        $unverifiedTeacher = User::factory()->unverified()->create(['email' => 'unverified@example.test']);
+        $unverifiedTeacher->assignRole('guru');
+
+        $this->createProfile($verifiedTeacher, $originSudin, $origin, $destination, 'Guru Terverifikasi', '081234567801');
+        TeacherProfile::factory()->for($unverifiedTeacher)->create([
+            'sudin_id' => $destinationSudin->id,
+            'destination_sudin_id' => $originSudin->id,
+            'province_code' => '31',
+            'regency_code' => $destination->regency_code,
+            'regency_name' => $destination->regency_name,
+            'district_code' => $destination->code,
+            'district_name' => $destination->name,
+            'village_code' => $destination->code.'.1001',
+            'village_name' => 'Kelurahan Tujuan',
+        ]);
+
+        $this->actingAs($verifiedTeacher)->getJson('/api/matches')
+            ->assertOk()
+            ->assertJsonCount(0, 'data');
     }
 
     public function test_teacher_cannot_save_an_unmapped_destination(): void
