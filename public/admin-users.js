@@ -69,4 +69,97 @@
             button.disabled = false;
         }
     });
+
+    const table = document.getElementById('users-table');
+    if (table) {
+        const rows = [...table.tBodies[0].rows];
+        const state = { query: '', position: '', page: 1, size: 10, sortCol: null, sortDir: 1 };
+        const sizeSelect = document.getElementById('dt-length');
+        const searchInput = document.getElementById('dt-search');
+        const positionSelect = document.getElementById('dt-position');
+        const info = document.getElementById('dt-info');
+        const pages = document.getElementById('dt-pages');
+        const emptyBox = document.getElementById('dt-empty');
+        const cellText = (row, index) => {
+            const cell = row.cells[index];
+            return (cell.dataset.order || cell.textContent).replace(/\s+/g, ' ').trim().toLowerCase();
+        };
+
+        function render() {
+            const query = state.query.toLowerCase();
+            let visible = rows.filter((row) => (!state.position || row.dataset.position === state.position) && (!query || row.textContent.replace(/\s+/g, ' ').toLowerCase().includes(query)));
+            if (state.sortCol !== null) {
+                visible = visible.sort((a, b) => cellText(a, state.sortCol).localeCompare(cellText(b, state.sortCol), 'id') * state.sortDir);
+            }
+            const lastPage = Math.max(1, Math.ceil(visible.length / state.size));
+            state.page = Math.min(state.page, lastPage);
+            const from = (state.page - 1) * state.size;
+            const shown = new Set(visible.slice(from, from + state.size));
+            const body = table.tBodies[0];
+            visible.forEach((row) => body.appendChild(row));
+            rows.forEach((row) => { row.hidden = !shown.has(row); });
+            emptyBox.hidden = visible.length > 0;
+            info.textContent = visible.length
+                ? `Menampilkan ${from + 1}-${from + shown.size} dari ${visible.length} user`
+                : 'Menampilkan 0 user';
+
+            const button = (label, page, disabled, current = false) => {
+                const element = document.createElement('button');
+                element.type = 'button';
+                element.className = `admin-pagination-link${current ? ' is-current' : ''}${disabled ? ' is-disabled' : ''}`;
+                element.textContent = label;
+                element.disabled = disabled;
+                element.addEventListener('click', () => { state.page = page; render(); });
+                return element;
+            };
+            const numbers = [];
+            for (let page = 1; page <= lastPage; page += 1) {
+                if (page === 1 || page === lastPage || Math.abs(page - state.page) <= 1) numbers.push(page);
+                else if (numbers[numbers.length - 1] !== '…') numbers.push('…');
+            }
+            pages.replaceChildren(
+                button('‹', state.page - 1, state.page === 1),
+                ...numbers.map((page) => {
+                    if (page === '…') {
+                        const gap = document.createElement('span');
+                        gap.className = 'admin-pagination-ellipsis admin-pagination-link';
+                        gap.textContent = '…';
+                        return gap;
+                    }
+                    return button(String(page), page, false, page === state.page);
+                }),
+                button('›', state.page + 1, state.page === lastPage),
+            );
+        }
+
+        searchInput.addEventListener('input', () => { state.query = searchInput.value.trim(); state.page = 1; render(); });
+        positionSelect.addEventListener('change', () => { state.position = positionSelect.value; state.page = 1; render(); });
+        sizeSelect.addEventListener('change', () => { state.size = Number(sizeSelect.value); state.page = 1; render(); });
+        table.tHead.addEventListener('click', (event) => {
+            const header = event.target.closest('th[data-sort]');
+            if (!header) return;
+            const column = Number(header.dataset.sort);
+            state.sortDir = state.sortCol === column ? -state.sortDir : 1;
+            state.sortCol = column;
+            table.tHead.querySelectorAll('th').forEach((th) => th.removeAttribute('aria-sort'));
+            header.setAttribute('aria-sort', state.sortDir === 1 ? 'ascending' : 'descending');
+            render();
+        });
+        render();
+
+        const modal = document.getElementById('user-modal');
+        const modalBody = document.getElementById('user-modal-body');
+        const closeModal = () => { modal.hidden = true; modalBody.replaceChildren(); document.body.classList.remove('modal-open'); };
+        document.addEventListener('click', (event) => {
+            const opener = event.target.closest('[data-open-user]');
+            if (opener) {
+                modalBody.replaceChildren(document.getElementById(opener.dataset.openUser).content.cloneNode(true));
+                modal.hidden = false;
+                document.body.classList.add('modal-open');
+                return;
+            }
+            if (event.target === modal || event.target.closest('#user-modal-close')) closeModal();
+        });
+        document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !modal.hidden) closeModal(); });
+    }
 })();

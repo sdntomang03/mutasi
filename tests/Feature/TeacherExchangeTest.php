@@ -420,16 +420,18 @@ class TeacherExchangeTest extends TestCase
             ->assertSee('Profil guru belum dibuat');
     }
 
-    public function test_admin_user_pagination_uses_compact_text_arrows_instead_of_large_icons(): void
+    public function test_admin_user_list_is_a_datatable_with_origin_destination_summary_and_detail_modal(): void
     {
         $admin = User::factory()->create(['email' => 'admin@example.test']);
         $admin->assignRole('admin');
         User::factory()->count(21)->create();
 
-        $response = $this->actingAs($admin)->get('/admin/users')->assertOk();
-        $response->assertSee('admin-pagination-arrow', false)
-            ->assertSee('aria-disabled="true"', false)
-            ->assertDontSee('class="w-5 h-5"', false);
+        $this->actingAs($admin)->get('/admin/users')
+            ->assertOk()
+            ->assertSee('id="users-table"', false)
+            ->assertSee('id="user-modal"', false)
+            ->assertSee('data-open-user', false)
+            ->assertDontSee('admin-pagination-arrow', false);
     }
 
     public function test_admin_can_permanently_delete_a_user_and_their_profile_data(): void

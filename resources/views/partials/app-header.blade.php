@@ -12,6 +12,7 @@
             <a href="{{ route('admin.match-notifications') }}" @class(['nav-link', 'nav-link-active' => request()->routeIs('admin.match-notifications')])>Email Kecocokan</a>
         @else
             <a href="{{ route('dashboard') }}" @class(['nav-link', 'nav-link-active' => request()->routeIs('dashboard')])>Dashboard</a>
+            <a href="{{ route('teacher-directory') }}" @class(['nav-link', 'nav-link-active' => request()->routeIs('teacher-directory')])>Daftar Guru</a>
             <a href="{{ route('teacher-profile.edit') }}" @class(['nav-link', 'nav-link-active' => request()->routeIs('teacher-profile.edit')])>Profil</a>
             <a href="{{ route('guide') }}" @class(['nav-link', 'nav-link-active' => request()->routeIs('guide')])>Panduan</a>
         @endif

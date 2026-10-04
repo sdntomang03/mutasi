@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MatchController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SudinController;
+use App\Http\Controllers\TeacherDirectoryController;
 use App\Http\Controllers\TeacherLifecycleController;
 use App\Http\Controllers\TeacherProfileController;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +25,7 @@ Route::redirect('/admin/login', '/login')->name('admin.login');
 
 Route::middleware(['auth', 'verified', 'role:guru'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
+    Route::get('/daftar-guru', TeacherDirectoryController::class)->name('teacher-directory');
     Route::view('/teacher-profile', 'teacher-profile')->name('teacher-profile.edit');
     Route::view('/panduan', 'guide')->name('guide');
 

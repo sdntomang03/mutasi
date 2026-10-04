@@ -20,15 +20,16 @@ class TeacherManagementController extends Controller
         return view('admin.users', [
             'users' => User::query()
                 ->with([
-                    'teacherProfile.sudin:id,name',
-                    'teacherProfile.destinationSudin:id,name',
+                    'teacherProfile.sudin:id,name,abbreviation',
+                    'teacherProfile.destinationSudin:id,name,abbreviation',
+                    'teacherProfile.destinationDistricts:code,name',
                     'teacherProfile.destinationLevels',
                     'teacherProfile.subject:id,name',
                     'teacherProfile.destinationSubjects:id,name',
                     'teacherProfile.deletionRequests' => fn ($query) => $query->where('status', 'pending'),
                 ])
                 ->latest()
-                ->paginate(20),
+                ->get(),
         ]);
     }
 
