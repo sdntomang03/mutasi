@@ -45,5 +45,5 @@
     <footer class="footer"><span>Ruang Tukar Guru · DKI Jakarta</span><span>Data profil hanya dibagikan kepada calon yang cocok</span></footer>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="{{ asset('app.js') }}" defer></script>
+<script src="{{ asset('app.js').'?v='.filemtime(public_path('app.js')) }}" defer></script>
 @endsection

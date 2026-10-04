@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Temukan calon tukeran guru DKI Jakarta berdasarkan kecocokan Sudin asal dan tujuan.">
     <title>Ruang Tukar Guru · DKI Jakarta</title>
-    <link rel="stylesheet" href="{{ asset('app.css') }}">
+    <link rel="stylesheet" href="{{ asset('app.css').'?v='.filemtime(public_path('app.css')) }}">
 </head>
 <body class="welcome-body">
     <div class="welcome-shell">

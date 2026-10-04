@@ -28,5 +28,5 @@
     <footer class="footer"><span>Ruang Tukar Guru · Panel administrator</span><span>Gunakan data wilayah DKI Jakarta yang terbaru</span></footer>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="{{ asset('admin.js') }}" defer></script>
+<script src="{{ asset('admin.js').'?v='.filemtime(public_path('admin.js')) }}" defer></script>
 @endsection

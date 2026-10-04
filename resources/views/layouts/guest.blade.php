@@ -13,7 +13,7 @@
         request()->routeIs('verification.notice') => 'Verifikasi email',
         default => 'Akun',
     } }} · Ruang Tukar Guru · DKI Jakarta</title>
-    <link rel="stylesheet" href="{{ asset('app.css') }}">
+    <link rel="stylesheet" href="{{ asset('app.css').'?v='.filemtime(public_path('app.css')) }}">
 </head>
 <body class="auth-body">
     <main class="auth-layout">
