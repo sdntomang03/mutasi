@@ -26,11 +26,19 @@
         return result;
     }
 
-    function render(subjects) {
-        document.getElementById('subject-count').textContent = subjects.length;
-        list.replaceChildren(...subjects.map((subject) => {
+    let allSubjects = [];
+
+    function render() {
+        const keyword = document.getElementById('subject-search').value.trim().toLowerCase();
+        const visible = allSubjects.filter((subject) => subject.name.toLowerCase().includes(keyword));
+        document.getElementById('subject-count').textContent = allSubjects.length;
+        const empty = document.getElementById('subject-empty');
+        empty.hidden = visible.length > 0;
+        empty.textContent = allSubjects.length ? 'Tidak ada mapel yang cocok.' : 'Belum ada mapel.';
+        list.replaceChildren(...visible.map((subject) => {
             const row = document.createElement('article');
-            row.className = 'admin-user-card';
+            row.className = 'subject-row';
+            row.dataset.id = subject.id;
             const input = document.createElement('input');
             input.value = subject.name;
             input.maxLength = 100;
@@ -41,11 +49,10 @@
             save.textContent = 'Simpan';
             save.dataset.action = 'save';
             const remove = document.createElement('button');
-            remove.className = 'button button-secondary';
+            remove.className = 'button button-ghost';
             remove.type = 'button';
             remove.textContent = 'Hapus';
             remove.dataset.action = 'delete';
-            row.dataset.id = subject.id;
             row.append(input, save, remove);
             return row;
         }));
@@ -53,7 +60,8 @@
 
     async function load() {
         try {
-            render((await request('/api/admin/subjects')).data);
+            allSubjects = (await request('/api/admin/subjects')).data;
+            render();
         } catch (error) {
             showToast(error.message, true);
         }
@@ -98,6 +106,8 @@
             showToast(error.message, true);
         }
     });
+
+    document.getElementById('subject-search').addEventListener('input', render);
 
     load();
 })();

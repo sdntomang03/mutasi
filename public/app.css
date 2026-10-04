@@ -484,3 +484,21 @@ a.admin-pagination-link:hover { border-color: #b9d5c3; color: var(--green-dark);
 .level-options { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
 .level-option { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; font-size: 12px; cursor: pointer; background: var(--surface); }
 .destination-role-grid { margin-bottom: 18px; }
+
+.subject-layout { display: grid; grid-template-columns: minmax(280px, 360px) minmax(0, 1fr); gap: 20px; align-items: start; margin-bottom: 40px; }
+.subject-tools, .subject-list-panel { padding: 24px; }
+.subject-tools .panel-heading, .subject-list-panel .panel-heading { margin-bottom: 16px; }
+.subject-form { display: grid; gap: 12px; }
+.subject-form .button { width: 100%; }
+.subject-file { padding: 9px 12px !important; height: auto; }
+.subject-search { margin-bottom: 14px; }
+.subject-list { display: grid; gap: 8px; max-height: 560px; overflow-y: auto; padding-right: 4px; }
+.subject-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; align-items: center; padding: 8px; border: 1px solid #e2ebe5; border-radius: 10px; background: #fbfdfb; }
+.subject-row input { width: 100%; min-height: 40px; border: 1px solid transparent; border-radius: 8px; padding: 0 10px; color: #263c40; background: transparent; font-size: 13px; font-weight: 600; outline: none; }
+.subject-row input:hover { border-color: #dce5e3; background: #fff; }
+.subject-row input:focus { border-color: var(--green); background: #fff; }
+.subject-row .button { min-height: 36px; padding: 0 12px; font-size: 11px; }
+.subject-empty { margin: 18px 0 0; color: var(--muted); font-size: 13px; text-align: center; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 860px) { .subject-layout { grid-template-columns: 1fr; } .subject-list { max-height: none; } }
+@media (max-width: 480px) { .subject-tools, .subject-list-panel { padding: 19px 14px; } .subject-row { grid-template-columns: 1fr 1fr; } .subject-row input { grid-column: 1 / -1; } }
