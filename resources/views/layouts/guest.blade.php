@@ -19,7 +19,7 @@
     <main class="auth-layout">
         <aside class="auth-aside">
             <a class="brand auth-brand" href="{{ route('welcome') }}">
-                <span class="brand-mark">RT</span>
+                <span class="brand-mark">@include('partials.brand-icon')</span>
                 <span>Ruang Tukar Guru <small>DKI Jakarta</small></span>
             </a>
             <div class="auth-aside-content">
@@ -36,7 +36,7 @@
         <section class="auth-main">
             <div class="auth-mobile-brand">
                 <a class="brand" href="{{ route('welcome') }}">
-                    <span class="brand-mark">RT</span>
+                    <span class="brand-mark">@include('partials.brand-icon')</span>
                     <span>Ruang Tukar Guru <small>DKI Jakarta</small></span>
                 </a>
             </div>

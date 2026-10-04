@@ -429,7 +429,7 @@ class TeacherExchangeTest extends TestCase
         $response = $this->actingAs($admin)->get('/admin/users')->assertOk();
         $response->assertSee('admin-pagination-arrow', false)
             ->assertSee('aria-disabled="true"', false)
-            ->assertDontSee('<svg', false);
+            ->assertDontSee('class="w-5 h-5"', false);
     }
 
     public function test_admin_can_permanently_delete_a_user_and_their_profile_data(): void

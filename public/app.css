@@ -395,7 +395,7 @@ a.admin-pagination-link:hover { border-color: #b9d5c3; color: var(--green-dark);
     .welcome-nav { gap: 5px; }
     .welcome-nav > a:not(.button) { display: none; }
     .welcome-nav .button { min-height: 36px; padding: 0 10px; font-size: 10px; }
-    .welcome-nav .button-ghost { display: none; }
+    .welcome-nav .button-ghost { padding: 0 12px; }
     .welcome-hero { grid-template-columns: 1fr; gap: 29px; padding: 49px 1% 37px; }
     .welcome-copy h1 { font-size: clamp(43px, 12vw, 58px); }
     .welcome-lead { font-size: 12px; }
@@ -507,3 +507,5 @@ a.admin-pagination-link:hover { border-color: #b9d5c3; color: var(--green-dark);
 .auth-main .unofficial-notice { width: 100%; max-width: 440px; margin: 16px auto 0; }
 .welcome-shell .unofficial-notice, .page-shell + .unofficial-notice { margin-top: 8px; }
 @media (max-width: 720px) { .unofficial-notice { width: min(100% - 28px, 500px); font-size: 10px; } }
+.brand-icon { width: 22px; height: 22px; }
+.brand-mark .brand-icon { width: 58%; height: 58%; }

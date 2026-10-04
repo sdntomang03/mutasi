@@ -11,7 +11,7 @@
     <div class="welcome-shell">
         <header class="welcome-header">
             <a class="brand" href="{{ route('welcome') }}" aria-label="Ruang Tukar Guru, beranda">
-                <span class="brand-mark">RT</span>
+                <span class="brand-mark">@include('partials.brand-icon')</span>
                 <span>Ruang Tukar Guru <small>DKI Jakarta</small></span>
             </a>
             <nav class="welcome-nav" aria-label="Navigasi utama">
