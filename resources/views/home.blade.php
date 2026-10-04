@@ -105,6 +105,7 @@
                 @endif
             </section>
         @endif
+    @include('partials.mutation-flow', ['profile' => $profile, 'matchCount' => $matches->count()])
     </main>
     <footer class="footer"><span>Ruang Tukar Guru · DKI Jakarta</span><span>Kontak calon tukeran hanya tersedia setelah login</span></footer>
 </div>
