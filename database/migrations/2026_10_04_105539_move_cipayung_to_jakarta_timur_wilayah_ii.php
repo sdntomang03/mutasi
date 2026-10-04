@@ -11,28 +11,32 @@ return new class extends Migration
 
     private const CIPAYUNG = '31.75.07';
 
+    private const DUREN_SAWIT = '31.75.10';
+
     public function up(): void
     {
-        $this->assign(self::WILAYAH_II);
+        $this->assign(self::CIPAYUNG, self::WILAYAH_II);
+        $this->assign(self::DUREN_SAWIT, self::WILAYAH_I);
     }
 
     public function down(): void
     {
-        $this->assign(self::WILAYAH_I);
+        $this->assign(self::CIPAYUNG, self::WILAYAH_I);
+        $this->assign(self::DUREN_SAWIT, self::WILAYAH_II);
     }
 
-    private function assign(string $sudinName): void
+    private function assign(string $districtCode, string $sudinName): void
     {
         $sudinId = DB::table('sudins')->where('name', $sudinName)->value('id');
 
-        if (! $sudinId || ! DB::table('districts')->where('code', self::CIPAYUNG)->exists()) {
+        if (! $sudinId || ! DB::table('districts')->where('code', $districtCode)->exists()) {
             return;
         }
 
-        DB::table('sudin_district')->where('district_code', self::CIPAYUNG)->delete();
+        DB::table('sudin_district')->where('district_code', $districtCode)->delete();
         DB::table('sudin_district')->insert([
             'sudin_id' => $sudinId,
-            'district_code' => self::CIPAYUNG,
+            'district_code' => $districtCode,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
