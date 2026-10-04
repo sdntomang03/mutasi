@@ -22,7 +22,7 @@
     </div>
 
     <div class="section-divider"></div>
-    <div class="section-title destination-title"><div><p class="eyebrow">TUJUAN MUTASI</p><h3>Ke mana kamu ingin pindah?</h3><p class="field-help">Pilih Sudin tujuan, lalu pilih semua kecamatan atau beberapa kecamatan tertentu.</p></div></div>
+    <div class="section-title destination-title"><div><p class="eyebrow">TUJUAN MUTASI</p><h3>Ke mana kamu ingin pindah?</h3><p class="field-help">Pilih Sudin tujuan untuk memuat kecamatan sesuai cakupan yang tersimpan di database. Kamu bisa memilih semua kecamatan atau beberapa kecamatan tertentu.</p></div></div>
     <div class="destination-builder">
         <div class="field-grid">
             <label class="field field-wide"><span>Sudin tujuan</span><select id="target-sudin" required><option value="">Pilih Sudin tujuan</option></select></label>

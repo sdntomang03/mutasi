@@ -452,6 +452,22 @@ class TeacherExchangeTest extends TestCase
             ->assertJsonPath('message', 'Simpan profil guru terlebih dahulu untuk mencari tukeran.');
     }
 
+    public function test_destination_district_options_come_from_the_selected_sudin_database_coverage(): void
+    {
+        $assignedDistrict = $this->district('31.73.01', 'Cengkareng', '31.73', 'Kota Administrasi Jakarta Barat');
+        $unassignedDistrict = $this->district('31.73.02', 'Kebon Jeruk Lain', '31.73', 'Kota Administrasi Jakarta Barat');
+        $sudin = $this->sudinFor($assignedDistrict, 'Jakarta Barat 1');
+        $teacher = $this->teacherUser('district-options@example.test');
+
+        $this->actingAs($teacher)->getJson('/api/sudins/'.$sudin->id.'/districts')
+            ->assertOk()
+            ->assertJsonPath('sudin.id', $sudin->id)
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $assignedDistrict->code)
+            ->assertJsonPath('data.0.name', 'Cengkareng')
+            ->assertJsonMissing(['id' => $unassignedDistrict->code]);
+    }
+
     public function test_unverified_users_are_excluded_from_reciprocal_matches(): void
     {
         $origin = $this->district('31.71.01', 'Kecamatan A', '31.71', 'Kota Administrasi Jakarta Pusat');

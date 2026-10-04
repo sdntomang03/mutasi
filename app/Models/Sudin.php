@@ -15,7 +15,8 @@ class Sudin extends Model
 
     public function districts(): BelongsToMany
     {
-        return $this->belongsToMany(District::class, 'sudin_district')->withTimestamps();
+        return $this->belongsToMany(District::class, 'sudin_district', 'sudin_id', 'district_code', 'id', 'code')
+            ->withTimestamps();
     }
 
     public function teacherProfiles(): HasMany

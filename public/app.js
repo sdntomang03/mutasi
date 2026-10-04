@@ -132,6 +132,9 @@
         try {
             const result = await api(`/sudins/${encodeURIComponent(sudinId)}/districts`);
             sudinDistricts.set(String(sudinId), result.data);
+            if (select.id === 'target-district' && $('#target-sudin').value !== String(sudinId)) {
+                return result.data;
+            }
             if (select.multiple) {
                 select.replaceChildren(...result.data.map((district) => new Option(`${district.name} · ${district.regency_name}`, district.id)));
                 select.disabled = result.data.length === 0;

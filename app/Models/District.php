@@ -17,6 +17,7 @@ class District extends Model
 
     public function sudins(): BelongsToMany
     {
-        return $this->belongsToMany(Sudin::class, 'sudin_district')->withTimestamps();
+        return $this->belongsToMany(Sudin::class, 'sudin_district', 'district_code', 'sudin_id', 'code', 'id')
+            ->withTimestamps();
     }
 }

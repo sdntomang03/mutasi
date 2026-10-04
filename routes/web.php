@@ -10,11 +10,17 @@ use App\Http\Controllers\TeacherLifecycleController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return auth()->check() ? redirect()->route('dashboard') : view('welcome');
+    if (! auth()->check()) {
+        return view('welcome');
+    }
+
+    return auth()->user()->hasRole('admin')
+        ? redirect()->route('admin.users')
+        : redirect()->route('dashboard');
 })->name('welcome');
 Route::redirect('/admin/login', '/login')->name('admin.login');
 
-Route::middleware(['auth', 'verified', 'role:guru|admin'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:guru'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::view('/teacher-profile', 'teacher-profile')->name('teacher-profile.edit');
 
