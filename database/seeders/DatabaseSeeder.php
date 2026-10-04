@@ -16,8 +16,8 @@ class DatabaseSeeder extends Seeder
             $this->call([
                 DkiDistrictSeeder::class,
                 DkiSudinSeeder::class,
-                FakeTeachersSeeder::class,
-                TargetedExchangeTeachersSeeder::class,
+                // FakeTeachersSeeder::class,
+                // TargetedExchangeTeachersSeeder::class,
             ]);
         }
     }
