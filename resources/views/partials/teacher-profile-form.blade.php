@@ -79,7 +79,7 @@
         <div class="field-grid">
             <label class="field field-wide"><span>Sudin tujuan</span><select id="target-sudin" required><option value="">Pilih Sudin tujuan</option></select></label>
             <label class="field"><span>Cakupan tujuan</span><select id="target-scope" disabled><option value="all">Semua kecamatan dalam Sudin</option><option value="districts">Pilih beberapa kecamatan</option></select></label>
-            <label class="field" id="target-district-wrap" hidden><span>Kecamatan tujuan</span><select id="target-district" multiple disabled></select><small class="field-help">Pilih satu atau beberapa kecamatan. Tahan Ctrl (Windows) atau Cmd (Mac) untuk memilih beberapa.</small></label>
+            <fieldset class="field level-field field-wide" id="target-district-wrap" hidden><span>Kecamatan tujuan</span><div class="level-options district-checks" id="target-district"></div><small class="field-help">Centang satu atau beberapa kecamatan tujuan.</small></fieldset>
         </div>
         <button class="button button-secondary add-destination" id="add-destination" type="button"><span>＋</span> Terapkan tujuan mutasi</button>
     </div>

@@ -80,7 +80,15 @@
             fillSelect(select, districts, 'Pilih kecamatan');
             return districts;
         } catch (error) {
-            select.replaceChildren(new Option('Gagal memuat kecamatan', ''));
+            if (isChecklist) {
+                setDistrictMessage(select, 'Gagal memuat kecamatan');
+            } else {
+                if (isChecklist) {
+                setDistrictMessage(select, 'Gagal memuat kecamatan');
+            } else {
+                select.replaceChildren(new Option('Gagal memuat kecamatan', ''));
+            }
+            }
             showToast(error.message, true);
             return [];
         }
@@ -121,11 +129,47 @@
         }
     }
 
+    const districtBoxes = () => [...document.querySelectorAll('[data-target-district]')];
+    const selectedDistrictBoxes = () => districtBoxes().filter((box) => box.checked);
+
+    function setDistrictMessage(container, message) {
+        const note = document.createElement('p');
+        note.className = 'district-checks-note';
+        note.textContent = message;
+        container.replaceChildren(note);
+    }
+
+    function renderDistrictChecks(container, districts) {
+        if (!districts.length) {
+            setDistrictMessage(container, 'Belum ada kecamatan pada Sudin ini.');
+            return;
+        }
+        container.replaceChildren(...districts.map((district) => {
+            const label = document.createElement('label');
+            label.className = 'level-option district-option';
+            const box = document.createElement('input');
+            box.type = 'checkbox';
+            box.value = district.id;
+            box.dataset.targetDistrict = '';
+            label.append(box, ` ${district.name}`);
+            return label;
+        }));
+    }
+
     async function loadSudinDistricts(sudinId, select, placeholder) {
-        select.replaceChildren(new Option('Memuat kecamatan...', ''));
-        select.disabled = true;
+        const isChecklist = select.id === 'target-district';
+        if (isChecklist) {
+            setDistrictMessage(select, 'Memuat kecamatan...');
+        } else {
+            select.replaceChildren(new Option('Memuat kecamatan...', ''));
+            select.disabled = true;
+        }
         if (!sudinId) {
-            select.replaceChildren(new Option(placeholder, ''));
+            if (isChecklist) {
+                setDistrictMessage(select, placeholder);
+            } else {
+                select.replaceChildren(new Option(placeholder, ''));
+            }
             return [];
         }
 
@@ -135,9 +179,8 @@
             if (select.id === 'target-district' && $('#target-sudin').value !== String(sudinId)) {
                 return result.data;
             }
-            if (select.multiple) {
-                select.replaceChildren(...result.data.map((district) => new Option(`${district.name} · ${district.regency_name}`, district.id)));
-                select.disabled = result.data.length === 0;
+            if (isChecklist) {
+                renderDistrictChecks(select, result.data);
             } else {
                 fillSelect(select, result.data.map((district) => ({
                     id: district.id,
@@ -217,8 +260,8 @@
                 if (selectedDistrictCodes.length) {
                     $('#target-scope').value = 'districts';
                     $('#target-district-wrap').hidden = false;
-                    [...$('#target-district').options].forEach((option) => {
-                        option.selected = selectedDistrictCodes.includes(option.value);
+                    districtBoxes().forEach((box) => {
+                        box.checked = selectedDistrictCodes.includes(box.value);
                     });
                 } else {
                     $('#target-scope').value = 'all';
@@ -264,7 +307,7 @@
     async function addDestination() {
         const sudinId = $('#target-sudin').value;
         const scope = $('#target-scope').value;
-        const selectedDistricts = [...$('#target-district').selectedOptions];
+        const selectedDistricts = selectedDistrictBoxes();
         if (!sudinId || (scope === 'districts' && selectedDistricts.length === 0)) {
             showToast('Pilih Sudin tujuan dan setidaknya satu kecamatan jika membatasi cakupan.', true);
             return;
@@ -277,7 +320,7 @@
         }
         const districts = sudinDistricts.get(sudinId)
             || await loadSudinDistricts(sudinId, $('#target-district'), 'Pilih kecamatan tujuan');
-        const districtCodes = scope === 'districts' ? selectedDistricts.map((option) => option.value) : [];
+        const districtCodes = scope === 'districts' ? selectedDistricts.map((box) => box.value) : [];
         const districtNames = districtCodes.map((code) => districts.find((district) => district.id === code)?.name || code);
 
         destinationList.push({
@@ -301,8 +344,8 @@
     $('#target-scope').addEventListener('change', (event) => {
         const chooseDistrict = event.target.value === 'districts';
         $('#target-district-wrap').hidden = !chooseDistrict;
-        if (chooseDistrict && !$('#target-district').selectedOptions.length) {
-            $('#target-district').focus();
+        if (chooseDistrict) {
+            districtBoxes()[0]?.focus();
         }
     });
     $('#add-destination').addEventListener('click', () => addDestination().catch((error) => showToast(error.message, true)));

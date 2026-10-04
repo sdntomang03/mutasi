@@ -270,7 +270,7 @@ class TeacherExchangeTest extends TestCase
             ->assertOk()
             ->assertSee('Profil mutasi')
             ->assertSee('profile-form')
-            ->assertSee('multiple');
+            ->assertSee('district-checks');
     }
 
     public function test_teacher_can_mark_mutated_and_request_admin_approved_profile_deletion(): void
