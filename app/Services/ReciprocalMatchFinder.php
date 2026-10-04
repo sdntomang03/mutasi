@@ -9,13 +9,16 @@ class ReciprocalMatchFinder
 {
     public function forProfile(TeacherProfile $profile, ?string $candidateOriginDistrictCode = null): Collection
     {
-        if (! $profile->sudin_id || ! $profile->destination_sudin_id || $profile->is_mutated
+        $profile->load('destinationLevels');
+        $destinationLevels = $profile->destinationLevels->pluck('level');
+        if (! $profile->position || ! $profile->level || ! $profile->destination_position || $destinationLevels->isEmpty()
+            || ! $profile->sudin_id || ! $profile->destination_sudin_id || $profile->is_mutated
             || $profile->deletionRequests()->where('status', 'pending')->exists()) {
             return new Collection;
         }
 
         return TeacherProfile::query()
-            ->with(['sudin:id,name', 'destinationSudin:id,name', 'destinationDistricts:code,name,regency_code,regency_name', 'user:id,email'])
+            ->with(['sudin:id,name', 'destinationSudin:id,name', 'destinationDistricts:code,name,regency_code,regency_name', 'destinationLevels', 'user:id,email'])
             ->whereNotNull('user_id')
             ->whereHas('user', fn ($user) => $user->whereNotNull('email_verified_at'))
             ->where('user_id', '!=', $profile->user_id)
@@ -23,6 +26,10 @@ class ReciprocalMatchFinder
             ->whereDoesntHave('deletionRequests', fn ($query) => $query->where('status', 'pending'))
             ->where('destination_sudin_id', $profile->sudin_id)
             ->where('sudin_id', $profile->destination_sudin_id)
+            ->where('position', $profile->destination_position)
+            ->where('destination_position', $profile->position)
+            ->whereIn('level', $destinationLevels)
+            ->whereHas('destinationLevels', fn ($levels) => $levels->where('level', $profile->level))
             ->when(
                 $profile->destinationDistricts->isNotEmpty(),
                 fn ($query) => $query->whereIn('district_code', $profile->destinationDistricts->pluck('code')),

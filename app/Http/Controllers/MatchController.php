@@ -16,10 +16,14 @@ class MatchController extends Controller
         ]);
 
         $profile = $request->user()->teacherProfile()
-            ->with(['sudin:id,name', 'destinationSudin:id,name', 'destinationDistricts:code,name,regency_code,regency_name'])
+            ->with(['sudin:id,name', 'destinationSudin:id,name', 'destinationDistricts:code,name,regency_code,regency_name', 'destinationLevels'])
             ->first();
         if (! $profile) {
             return response()->json(['message' => 'Simpan profil guru terlebih dahulu untuk mencari tukeran.'], 422);
+        }
+
+        if (! $profile->position || ! $profile->level || ! $profile->destination_position || $profile->destinationLevels->isEmpty()) {
+            return response()->json(['message' => 'Lengkapi jabatan dan jenjang asal serta tujuan pada profil terlebih dahulu.'], 422);
         }
 
         if (! $profile->destination_sudin_id) {
@@ -43,11 +47,15 @@ class MatchController extends Controller
                 'name' => $candidate->name,
                 'phone' => $candidate->phone,
                 'employment_type' => $candidate->employment_type,
+                'position' => $candidate->position,
+                'level' => $candidate->level,
                 'school_name' => $candidate->school_name,
                 'school_address' => $candidate->school_address,
                 'sudin' => $candidate->sudin->name,
                 'destination' => [
                     'sudin' => $candidate->destinationSudin->name,
+                    'position' => $candidate->destination_position,
+                    'levels' => $candidate->destinationLevels->pluck('level')->values(),
                     'districts' => $candidate->destinationDistricts->map(fn ($district) => [
                         'code' => $district->code,
                         'name' => $district->name,

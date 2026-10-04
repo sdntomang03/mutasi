@@ -39,6 +39,9 @@ class TeacherProfileFactory extends Factory
             'name' => $faker->name(),
             'phone' => fake()->unique()->numerify('+628##########'),
             'employment_type' => fake()->randomElement(['PNS', 'PPPK', 'KKI']),
+            'position' => 'guru_kelas',
+            'level' => 'SD',
+            'destination_position' => 'guru_kelas',
             'school_name' => 'SDN '.$faker->city().' '.fake()->numberBetween(1, 5),
             'school_address' => $faker->address(),
             'sudin_id' => $sudin->id,
@@ -58,6 +61,9 @@ class TeacherProfileFactory extends Factory
         return $this->afterCreating(function (TeacherProfile $profile): void {
             if (! $profile->user->hasRole('guru')) {
                 $profile->user->assignRole(Role::findOrCreate('guru', 'web'));
+            }
+            if ($profile->destinationLevels()->doesntExist()) {
+                $profile->syncDestinationLevels(['SD']);
             }
             if (fake()->boolean(50)) {
                 $profile->destinationDistricts()->sync(

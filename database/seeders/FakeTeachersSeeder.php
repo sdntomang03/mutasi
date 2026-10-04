@@ -78,6 +78,9 @@ class FakeTeachersSeeder extends Seeder
                 'name' => $user->name,
                 'phone' => sprintf('+62812%08d', $number),
                 'employment_type' => fake()->randomElement(['PNS', 'PPPK', 'KKI']),
+                'position' => 'guru_kelas',
+                'level' => 'SD',
+                'destination_position' => 'guru_kelas',
                 'school_name' => 'SDN '.$originDistrict->name.' '.fake()->numberBetween(1, 5),
                 'school_address' => $faker->address(),
                 'sudin_id' => $originSudin->id,
@@ -100,6 +103,7 @@ class FakeTeachersSeeder extends Seeder
 
         $destinationDistrictCodes = $destinationSudin->districts->pluck('code');
         $profile->destinationDistricts()->sync($destinationDistrictCodes);
+        $profile->syncDestinationLevels(['SD']);
         $profile->destinations()->delete();
     }
 }

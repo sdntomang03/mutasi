@@ -27,11 +27,11 @@
                 <p>Setelah profil tersimpan, calon tukeran dengan kecocokan Sudin dua arah akan muncul di sini.</p>
                 <a class="button button-primary" href="{{ route('teacher-profile.edit') }}">Buat profil</a>
             </section>
-        @elseif (! $profile->destination_sudin_id || ! $profile->sudin_id)
+        @elseif (! $profile->destination_sudin_id || ! $profile->sudin_id || ! $profile->position || ! $profile->level || ! $profile->destination_position || $profile->destinationLevels->isEmpty())
             <section class="empty-state dashboard-empty">
                 <span class="empty-symbol">↔</span>
                 <h2>Lengkapi profil mutasimu</h2>
-                <p>Tambahkan Sudin asal dan tujuan pada profil untuk mulai menemukan calon tukeran.</p>
+                <p>Tambahkan Sudin, jabatan, dan jenjang asal serta tujuan pada profil untuk mulai menemukan calon tukeran.</p>
                 <a class="button button-primary" href="{{ route('teacher-profile.edit') }}">Perbarui profil</a>
             </section>
         @else
@@ -39,6 +39,8 @@
                 <div><span>Sudin asal</span><strong>{{ $profile->sudin?->name }}</strong></div>
                 <span class="summary-arrow" aria-hidden="true">↔</span>
                 <div><span>Sudin tujuan</span><strong>{{ $profile->destinationSudin?->name }}</strong></div>
+                <div><span>Jabatan · jenjang asal</span><strong>{{ \App\Models\TeacherProfile::POSITIONS[$profile->position] }} · {{ $profile->level }}</strong></div>
+                <div><span>Jabatan · jenjang tujuan</span><strong>{{ \App\Models\TeacherProfile::POSITIONS[$profile->destination_position] }} · {{ $profile->destinationLevels->pluck('level')->join(', ') }}</strong></div>
             </section>
 
             <section class="panel dashboard-match-panel">
@@ -46,7 +48,7 @@
                     <div><p class="eyebrow">HASIL PENCARIAN</p><h2>Calon tukeran</h2></div>
                     <span class="match-icon" aria-hidden="true">↔</span>
                 </div>
-                <p class="muted-text">Calon ditampilkan jika Sudin asal dan tujuan kedua guru saling cocok.</p>
+                <p class="muted-text">Calon ditampilkan jika Sudin, jabatan, dan jenjang asal serta tujuan kedua guru saling cocok.</p>
                 <form method="GET" action="{{ route('dashboard') }}" class="dashboard-filter">
                     <label class="field" for="candidate-origin-district">
                         <span>Kecamatan asal calon (dalam Sudin tujuan)</span>
@@ -78,6 +80,8 @@
                                 </div>
                                 <p class="match-school">{{ $candidate->school_name }} <span>·</span> {{ $candidate->sudin->name }}</p>
                                 <div class="match-facts">
+                                    <p><span>Jabatan · jenjang</span>{{ \App\Models\TeacherProfile::POSITIONS[$candidate->position] }} · {{ $candidate->level }}</p>
+                                    <p><span>Mencari</span>{{ \App\Models\TeacherProfile::POSITIONS[$candidate->destination_position] }} · {{ $candidate->destinationLevels->pluck('level')->join(', ') }}</p>
                                     <p><span>Asal sekolah</span>{{ $candidate->village_name }}, {{ $candidate->district_name }}, {{ $candidate->regency_name }}</p>
                                     <p><span>Alamat sekolah</span>{{ $candidate->school_address }}</p>
                                     <div class="match-destination-fact">

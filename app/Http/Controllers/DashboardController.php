@@ -12,7 +12,7 @@ class DashboardController extends Controller
     public function __invoke(Request $request, ReciprocalMatchFinder $matchFinder): View
     {
         $profile = $request->user()->teacherProfile()
-            ->with(['sudin:id,name', 'destinationSudin:id,name', 'destinationDistricts:code,name,regency_code,regency_name'])
+            ->with(['sudin:id,name', 'destinationSudin:id,name', 'destinationDistricts:code,name,regency_code,regency_name', 'destinationLevels'])
             ->first();
         $filters = $request->validate([
             'candidate_origin_district_code' => ['nullable', 'string', 'regex:/^31\.\d{2}\.\d{2}$/', 'exists:districts,code'],

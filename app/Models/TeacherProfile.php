@@ -14,6 +14,10 @@ class TeacherProfile extends Model
 {
     use HasFactory, HasUuids, SoftDeletes;
 
+    public const LEVELS = ['SD', 'SMP', 'SMA', 'SMK'];
+
+    public const POSITIONS = ['guru_kelas' => 'Guru kelas', 'guru_mapel' => 'Guru mapel'];
+
     protected $fillable = [
         'name',
         'user_id',
@@ -22,6 +26,9 @@ class TeacherProfile extends Model
         'school_name',
         'school_address',
         'sudin_id',
+        'position',
+        'level',
+        'destination_position',
         'destination_sudin_id',
         'is_mutated',
         'province_code',
@@ -57,6 +64,24 @@ class TeacherProfile extends Model
     {
         return $this->belongsToMany(District::class, 'teacher_profile_destination_district', 'teacher_profile_id', 'district_code', 'id', 'code')
             ->withTimestamps();
+    }
+
+    public function destinationLevels(): HasMany
+    {
+        return $this->hasMany(TeacherDestinationLevel::class);
+    }
+
+    /**
+     * @param  array<int, string>  $levels
+     */
+    public function syncDestinationLevels(array $levels): void
+    {
+        $levels = array_values(array_unique($levels));
+        $this->destinationLevels()->whereNotIn('level', $levels)->delete();
+        foreach ($levels as $level) {
+            $this->destinationLevels()->firstOrCreate(['level' => $level]);
+        }
+        $this->unsetRelation('destinationLevels');
     }
 
     public function destinations(): HasMany

@@ -62,6 +62,9 @@ class TargetedExchangeTeachersSeeder extends Seeder
                 'name' => $name,
                 'phone' => $phone,
                 'employment_type' => fake()->randomElement(['PNS', 'PPPK', 'KKI']),
+                'position' => 'guru_kelas',
+                'level' => 'SD',
+                'destination_position' => 'guru_kelas',
                 'school_name' => 'SDN '.$originDistrict->name.' 1',
                 'school_address' => fake('id_ID')->address(),
                 'sudin_id' => $originSudin->id,
@@ -76,6 +79,7 @@ class TargetedExchangeTeachersSeeder extends Seeder
             ],
         );
         $profile->destinationDistricts()->sync([]);
+        $profile->syncDestinationLevels(['SD']);
         $profile->destinations()->delete();
     }
 }

@@ -8,6 +8,22 @@
                 <option value="">Pilih status</option><option value="PNS">PNS</option><option value="PPPK">PPPK</option><option value="KKI">KKI</option>
             </select>
         </label>
+        <label class="field"><span>Jabatan saat ini</span>
+            <select name="position" id="origin-position" required>
+                <option value="">Pilih jabatan</option>
+                @foreach (\App\Models\TeacherProfile::POSITIONS as $value => $label)
+                    <option value="{{ $value }}">{{ $label }}</option>
+                @endforeach
+            </select>
+        </label>
+        <label class="field"><span>Jenjang sekolah asal</span>
+            <select name="level" id="origin-level" required>
+                <option value="">Pilih jenjang</option>
+                @foreach (\App\Models\TeacherProfile::LEVELS as $level)
+                    <option value="{{ $level }}">{{ $level }}</option>
+                @endforeach
+            </select>
+        </label>
         <label class="field"><span>Sudin asal</span><select name="sudin_id" id="origin-sudin" required><option value="">Memuat Sudin...</option></select></label>
         <label class="field field-wide"><span>Nama sekolah asal</span><input name="school_name" required maxlength="160" placeholder="Contoh: SDN ..."></label>
         <label class="field field-wide"><span>Alamat sekolah asal</span><textarea name="school_address" required rows="2" maxlength="1000" placeholder="Alamat lengkap sekolah"></textarea></label>
@@ -23,6 +39,25 @@
 
     <div class="section-divider"></div>
     <div class="section-title destination-title"><div><p class="eyebrow">TUJUAN MUTASI</p><h3>Ke mana kamu ingin pindah?</h3><p class="field-help">Pilih Sudin tujuan untuk memuat kecamatan sesuai cakupan yang tersimpan di database. Kamu bisa memilih semua kecamatan atau beberapa kecamatan tertentu.</p></div></div>
+    <div class="field-grid destination-role-grid">
+        <label class="field"><span>Jabatan yang dituju</span>
+            <select name="destination_position" id="target-position" required>
+                <option value="">Pilih jabatan tujuan</option>
+                @foreach (\App\Models\TeacherProfile::POSITIONS as $value => $label)
+                    <option value="{{ $value }}">{{ $label }}</option>
+                @endforeach
+            </select>
+        </label>
+        <fieldset class="field level-field" id="target-levels">
+            <span>Jenjang tujuan</span>
+            <div class="level-options">
+                @foreach (\App\Models\TeacherProfile::LEVELS as $level)
+                    <label class="level-option"><input type="checkbox" value="{{ $level }}" data-target-level> {{ $level }}</label>
+                @endforeach
+            </div>
+            <small class="field-help" id="target-level-help">Pilih jabatan tujuan terlebih dahulu. Guru mapel dapat memilih beberapa jenjang, guru kelas hanya satu jenjang.</small>
+        </fieldset>
+    </div>
     <div class="destination-builder">
         <div class="field-grid">
             <label class="field field-wide"><span>Sudin tujuan</span><select id="target-sudin" required><option value="">Pilih Sudin tujuan</option></select></label>

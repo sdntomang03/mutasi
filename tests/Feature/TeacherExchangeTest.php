@@ -666,6 +666,62 @@ class TeacherExchangeTest extends TestCase
         $this->actingAs($admin)->get(route('guide'))->assertForbidden();
     }
 
+    public function test_class_teacher_destination_allows_one_level_while_subject_teacher_allows_several(): void
+    {
+        $originA = $this->district('31.71.01', 'Kecamatan A', '31.71', 'Kota Administrasi Jakarta Pusat');
+        $originB = $this->district('31.72.01', 'Kecamatan B', '31.72', 'Kota Administrasi Jakarta Utara');
+        $sudinA = $this->sudinFor($originA, 'Jakarta Pusat 1');
+        $this->sudinFor($originB, 'Jakarta Utara 1');
+        $user = $this->teacherUser('levels@example.test');
+        $payload = $this->profilePayload($sudinA, $originA, $originB);
+
+        $this->actingAs($user)->postJson('/api/profile', [...$payload, 'destination_levels' => ['SD', 'SMP']])
+            ->assertUnprocessable();
+        $this->actingAs($user)->postJson('/api/profile', [...$payload, 'level' => 'TK'])
+            ->assertJsonValidationErrors('level');
+        $this->actingAs($user)->postJson('/api/profile', [...$payload, 'destination_levels' => []])
+            ->assertJsonValidationErrors('destination_levels');
+
+        $this->actingAs($user)->postJson('/api/profile', [
+            ...$payload,
+            'position' => 'guru_mapel',
+            'destination_position' => 'guru_mapel',
+            'destination_levels' => ['SD', 'SMP'],
+        ])->assertCreated();
+
+        $this->assertEqualsCanonicalizing(['SD', 'SMP'], $user->teacherProfile->destinationLevels->pluck('level')->all());
+    }
+
+    public function test_matching_requires_reciprocal_position_and_level(): void
+    {
+        $originA = $this->district('31.71.01', 'Kecamatan A', '31.71', 'Kota Administrasi Jakarta Pusat');
+        $originB = $this->district('31.72.01', 'Kecamatan B', '31.72', 'Kota Administrasi Jakarta Utara');
+        $sudinA = $this->sudinFor($originA, 'Jakarta Pusat 1');
+        $sudinB = $this->sudinFor($originB, 'Jakarta Utara 1');
+        $userA = $this->teacherUser('a@example.test');
+        $userB = $this->teacherUser('b@example.test');
+        $mapelA = [
+            'position' => 'guru_mapel',
+            'level' => 'SMP',
+            'destination_position' => 'guru_mapel',
+            'destination_levels' => ['SMP', 'SMA'],
+        ];
+        $this->actingAs($userA)->postJson('/api/profile', [...$this->profilePayload($sudinA, $originA, $originB, 'Guru A', '081234567801'), ...$mapelA])->assertCreated();
+
+        $bPayload = $this->profilePayload($sudinB, $originB, $originA, 'Guru B', '081234567802');
+        $matchNames = function (array $overrides) use ($userA, $userB, $bPayload): array {
+            $this->actingAs($userB)->postJson('/api/profile', [...$bPayload, ...$overrides])->assertSuccessful();
+
+            return collect($this->actingAs($userA)->getJson('/api/matches')->json('data'))->pluck('name')->all();
+        };
+
+        $this->assertSame(['Guru B'], $matchNames(['position' => 'guru_mapel', 'level' => 'SMA', 'destination_position' => 'guru_mapel', 'destination_levels' => ['SMP', 'SD']]));
+        $this->assertSame([], $matchNames(['position' => 'guru_kelas', 'level' => 'SMA', 'destination_position' => 'guru_mapel', 'destination_levels' => ['SMP']]));
+        $this->assertSame([], $matchNames(['position' => 'guru_mapel', 'level' => 'SD', 'destination_position' => 'guru_mapel', 'destination_levels' => ['SMP']]));
+        $this->assertSame([], $matchNames(['position' => 'guru_mapel', 'level' => 'SMA', 'destination_position' => 'guru_mapel', 'destination_levels' => ['SD']]));
+        $this->assertSame([], $matchNames(['position' => 'guru_mapel', 'level' => 'SMA', 'destination_position' => 'guru_kelas', 'destination_levels' => ['SMP']]));
+    }
+
     private function teacherUser(string $email): User
     {
         $user = User::factory()->create(['email' => $email]);
@@ -720,6 +776,10 @@ class TeacherExchangeTest extends TestCase
             'name' => $name,
             'phone' => $phone,
             'employment_type' => 'PNS',
+            'position' => 'guru_kelas',
+            'level' => 'SD',
+            'destination_position' => 'guru_kelas',
+            'destination_levels' => ['SD'],
             'school_name' => 'SDN Contoh',
             'school_address' => 'Jl. Contoh No. 1',
             'sudin_id' => $originSudin->id,

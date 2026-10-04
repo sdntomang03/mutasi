@@ -152,14 +152,36 @@
         }
     }
 
+    const levelBoxes = () => [...document.querySelectorAll('[data-target-level]')];
+
+    // Guru kelas hanya boleh satu jenjang tujuan; guru mapel boleh beberapa.
+    function syncLevelRules() {
+        const isClassTeacher = $('#target-position').value === 'guru_kelas';
+        const checked = levelBoxes().filter((box) => box.checked);
+        if (isClassTeacher && checked.length > 1) {
+            checked.slice(1).forEach((box) => { box.checked = false; });
+        }
+        $('#target-level-help').textContent = isClassTeacher
+            ? 'Guru kelas hanya dapat memilih satu jenjang tujuan.'
+            : $('#target-position').value === 'guru_mapel'
+                ? 'Guru mapel dapat memilih satu atau beberapa jenjang tujuan.'
+                : 'Pilih jabatan tujuan terlebih dahulu. Guru mapel dapat memilih beberapa jenjang, guru kelas hanya satu jenjang.';
+    }
+
+    $('#target-position').addEventListener('change', syncLevelRules);
+    $('#target-levels').addEventListener('change', (event) => {
+        if ($('#target-position').value === 'guru_kelas' && event.target.checked) {
+            levelBoxes().forEach((box) => { box.checked = box === event.target; });
+        }
+    });
     async function loadExistingProfile() {
         try {
             const result = await api('/profile');
             const profile = result.data;
             if (!profile) return;
 
-            for (const field of ['name', 'phone', 'employment_type', 'school_name', 'school_address', 'sudin_id']) {
-                form.elements.namedItem(field).value = profile[field];
+            for (const field of ['name', 'phone', 'employment_type', 'position', 'level', 'destination_position', 'school_name', 'school_address', 'sudin_id']) {
+                form.elements.namedItem(field).value = profile[field] ?? '';
             }
 
             $('#origin-regency').value = profile.regency_code;
@@ -168,6 +190,9 @@
             await loadVillages(profile.district_code, $('#origin-village'));
             $('#origin-village').value = profile.village_code;
 
+            const savedLevels = (profile.destination_levels || []).map((item) => item.level);
+            levelBoxes().forEach((box) => { box.checked = savedLevels.includes(box.value); });
+            syncLevelRules();
             destinationList.splice(0, destinationList.length);
             if (profile.destination_sudin_id) {
                 $('#target-sudin').value = String(profile.destination_sudin_id);
@@ -299,6 +324,12 @@
             return;
         }
 
+        const selectedLevels = levelBoxes().filter((box) => box.checked).map((box) => box.value);
+        if (!selectedLevels.length) {
+            showToast('Pilih minimal satu jenjang tujuan.', true);
+            return;
+        }
+
         const fields = new FormData(form);
         const payload = Object.fromEntries(fields.entries());
         payload.province_code = '31';
@@ -310,6 +341,7 @@
         payload.village_name = originVillage.name;
         payload.destination_sudin_id = destinationList[0].sudin_id;
         payload.destination_district_codes = destinationList[0].district_codes;
+        payload.destination_levels = selectedLevels;
 
         const submit = form.querySelector('[type="submit"]');
         submit.disabled = true;

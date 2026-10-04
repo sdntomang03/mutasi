@@ -479,3 +479,8 @@ a.admin-pagination-link:hover { border-color: #b9d5c3; color: var(--green-dark);
 .guide-card p { margin: 0 0 10px; }
 .guide-wide { grid-column: 1 / -1; }
 @media (max-width: 720px) { .guide-grid { grid-template-columns: 1fr; } .guide-card { padding: 18px; } }
+
+.level-field { border: 0; padding: 0; margin: 0; min-width: 0; }
+.level-options { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.level-option { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; font-size: 12px; cursor: pointer; background: var(--surface); }
+.destination-role-grid { margin-bottom: 18px; }
