@@ -83,12 +83,12 @@
                             data-destination="{{ $teacher->destination_sudin_id }}">
                             <td data-order="{{ strtolower($teacher->name) }}">
                                 <strong>{{ $teacher->name }}</strong>
-                                <small>{{ $teacher->school_name }}</small>
+                                <span class="dt-badge dt-badge-soft">{{ $teacher->employment_type }}</span>
                             </td>
                             <td data-order="{{ strtolower($teacher->sudin?->abbreviation ?: $teacher->sudin?->name) }}">
                                 <span class="dt-badge">{{ $teacher->sudin?->abbreviation ?: $teacher->sudin?->name
                                     }}</span>
-                                <span class="dt-badge dt-badge-soft">{{ $teacher->employment_type }}</span>
+
                                 <small>{{ $teacher->level }}{{ $originSubject ? ' · '.$originSubject : '' }} · {{
                                     $teacher->district_name }}</small>
                             </td>
