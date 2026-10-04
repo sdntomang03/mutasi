@@ -469,3 +469,13 @@ a.admin-pagination-link:hover { border-color: #b9d5c3; color: var(--green-dark);
     .sudin-list { grid-template-columns: 1fr; }
     .district-options { grid-template-columns: 1fr 1fr; }
 }
+
+.guide-main { max-width: 980px; }
+.guide-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 28px; }
+.guide-card { padding: 22px 24px; font-size: 12px; line-height: 1.7; color: var(--muted); }
+.guide-card h2 { margin: 0 0 10px; font: 800 18px 'Manrope', sans-serif; letter-spacing: -.03em; color: var(--ink, #1c362d); }
+.guide-card ul, .guide-card ol { margin: 0 0 10px; padding-left: 18px; }
+.guide-card li { margin-bottom: 6px; }
+.guide-card p { margin: 0 0 10px; }
+.guide-wide { grid-column: 1 / -1; }
+@media (max-width: 720px) { .guide-grid { grid-template-columns: 1fr; } .guide-card { padding: 18px; } }

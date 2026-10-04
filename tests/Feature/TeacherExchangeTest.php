@@ -8,6 +8,7 @@ use App\Models\Sudin;
 use App\Models\TeacherProfile;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Mail\MailManager;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -196,19 +197,56 @@ class TeacherExchangeTest extends TestCase
             '081234567802',
         ))->assertCreated();
 
-        Mail::assertQueued(ReciprocalMatchFound::class, 2);
-        Mail::assertQueued(ReciprocalMatchFound::class, fn (ReciprocalMatchFound $mail) => $mail->teacherName === 'Guru A'
+        Mail::assertSent(ReciprocalMatchFound::class, 2);
+        Mail::assertSent(ReciprocalMatchFound::class, fn (ReciprocalMatchFound $mail) => $mail->teacherName === 'Guru A'
             && $mail->matchedTeacherName === 'Guru B'
             && $mail->hasTo('guru-a@example.test'));
-        Mail::assertQueued(ReciprocalMatchFound::class, fn (ReciprocalMatchFound $mail) => $mail->teacherName === 'Guru B'
+        Mail::assertSent(ReciprocalMatchFound::class, fn (ReciprocalMatchFound $mail) => $mail->teacherName === 'Guru B'
             && $mail->matchedTeacherName === 'Guru A'
             && $mail->hasTo('guru-b@example.test'));
 
         $payload = $this->profilePayload($sudinB, $originB, $originA, 'Guru B', '081234567802');
         $this->actingAs($userB)->postJson('/api/profile', $payload)->assertOk();
 
-        Mail::assertQueued(ReciprocalMatchFound::class, 2);
+        Mail::assertSent(ReciprocalMatchFound::class, 2);
         $this->assertDatabaseCount('notified_match_pairs', 1);
+    }
+
+    public function test_admin_can_resend_failed_match_email_and_failure_is_recorded(): void
+    {
+        $originA = $this->district('31.71.01', 'Kecamatan A', '31.71', 'Kota Administrasi Jakarta Pusat');
+        $originB = $this->district('31.72.01', 'Kecamatan B', '31.72', 'Kota Administrasi Jakarta Utara');
+        $sudinA = $this->sudinFor($originA, 'Jakarta Pusat 1');
+        $sudinB = $this->sudinFor($originB, 'Jakarta Utara 1');
+        $userA = $this->teacherUser('guru-a@example.test');
+        $userB = $this->teacherUser('guru-b@example.test');
+        $userA->markEmailAsVerified();
+        $userB->markEmailAsVerified();
+        $this->createProfile($userA, $sudinA, $originA, $originB, 'Guru A', '081234567801');
+
+        Mail::shouldReceive('to')->andThrow(new \RuntimeException('SMTP down'));
+        $this->createProfile($userB, $sudinB, $originB, $originA, 'Guru B', '081234567802');
+
+        $pair = DB::table('notified_match_pairs')->first();
+        $this->assertNull($pair->sent_at);
+        $this->assertSame('SMTP down', $pair->last_error);
+
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+        $this->actingAs($admin)->get(route('admin.match-notifications'))
+            ->assertOk()
+            ->assertSee('Guru A')
+            ->assertSee('SMTP down');
+
+        Mail::swap(new MailManager($this->app));
+        Mail::fake();
+        $this->actingAs($admin)->postJson(route('api.admin.match-notifications.send', $pair->id))->assertOk();
+
+        Mail::assertSent(ReciprocalMatchFound::class, 2);
+        $this->assertNotNull(DB::table('notified_match_pairs')->first()->sent_at);
+
+        $this->actingAs($this->teacherUser('other@example.test'))
+            ->postJson(route('api.admin.match-notifications.send', $pair->id))->assertForbidden();
     }
 
     public function test_dashboard_lists_matches_and_teacher_profile_has_a_separate_page(): void
@@ -349,7 +387,7 @@ class TeacherExchangeTest extends TestCase
             'Guru A',
             '081234567801',
         ))->assertOk();
-        Mail::assertNothingQueued();
+        Mail::assertNothingSent();
     }
 
     public function test_admin_can_update_any_teacher_mutation_status_but_regular_users_cannot(): void
@@ -612,6 +650,20 @@ class TeacherExchangeTest extends TestCase
         ])
             ->assertUnprocessable()
             ->assertJsonPath('message', 'Satu kecamatan hanya dapat masuk ke satu wilayah Sudin.');
+    }
+
+    public function test_teacher_can_open_guide_but_guests_and_admins_cannot(): void
+    {
+        $this->actingAs($this->teacherUser('guide@example.test'))->get(route('guide'))
+            ->assertOk()
+            ->assertSee('Aturan pencocokan');
+
+        auth()->logout();
+        $this->get(route('guide'))->assertRedirect(route('login'));
+
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+        $this->actingAs($admin)->get(route('guide'))->assertForbidden();
     }
 
     private function teacherUser(string $email): User

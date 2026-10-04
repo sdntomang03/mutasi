@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\MatchNotificationController;
 use App\Http\Controllers\Admin\TeacherManagementController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MatchController;
@@ -23,6 +24,7 @@ Route::redirect('/admin/login', '/login')->name('admin.login');
 Route::middleware(['auth', 'verified', 'role:guru'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::view('/teacher-profile', 'teacher-profile')->name('teacher-profile.edit');
+    Route::view('/panduan', 'guide')->name('guide');
 
     Route::prefix('api')->group(function () {
         Route::get('/sudins', [SudinController::class, 'publicIndex']);
@@ -39,6 +41,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::view('/sudins', 'admin.sudins')->name('sudins');
     Route::get('/users', [TeacherManagementController::class, 'index'])->name('users');
     Route::get('/deletion-requests', [TeacherManagementController::class, 'deletionRequests'])->name('deletion-requests');
+    Route::get('/match-notifications', [MatchNotificationController::class, 'index'])->name('match-notifications');
 });
 
 Route::middleware(['auth', 'role:admin'])->prefix('api/admin')->name('api.admin.')->group(function () {
@@ -46,6 +49,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('api/admin')->name('api.admin.
     Route::post('/sudins', [SudinController::class, 'store']);
     Route::put('/sudins/{sudin}', [SudinController::class, 'update']);
     Route::delete('/sudins/{sudin}', [SudinController::class, 'destroy']);
+    Route::post('/match-notifications/scan', [MatchNotificationController::class, 'scan'])->name('match-notifications.scan');
+    Route::post('/match-notifications/send-pending', [MatchNotificationController::class, 'sendPending'])->name('match-notifications.send-pending');
+    Route::post('/match-notifications/{pair}/send', [MatchNotificationController::class, 'send'])->name('match-notifications.send');
     Route::patch('/users/{user}/verify-email', [TeacherManagementController::class, 'verifyEmail'])
         ->name('users.verify-email');
     Route::delete('/users/{user}', [TeacherManagementController::class, 'destroyUser'])
