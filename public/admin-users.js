@@ -31,7 +31,8 @@
         const statusButton = event.target.closest('[data-save-admin-status]');
         const reviewButton = event.target.closest('[data-review-deletion]');
         const verifyEmailButton = event.target.closest('[data-verify-user-email]');
-        const button = statusButton || reviewButton || verifyEmailButton;
+        const deleteUserButton = event.target.closest('[data-delete-user]');
+        const button = statusButton || reviewButton || verifyEmailButton || deleteUserButton;
         if (!button) return;
 
         button.disabled = true;
@@ -44,6 +45,11 @@
                 });
             } else if (verifyEmailButton) {
                 result = await request(verifyEmailButton.dataset.verifyUserEmail, 'PATCH', {});
+            } else if (deleteUserButton) {
+                if (!window.confirm(`Hapus permanen akun ${deleteUserButton.dataset.userEmail} beserta profil dan data terkait? Tindakan ini tidak dapat dibatalkan.`)) {
+                    return;
+                }
+                result = await request(deleteUserButton.dataset.deleteUser, 'DELETE', {});
             } else {
                 const decision = reviewButton.dataset.reviewDeletion;
                 const confirmation = decision === 'approve'

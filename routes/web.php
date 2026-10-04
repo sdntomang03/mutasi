@@ -1,12 +1,12 @@
 <?php
 
-use App\Http\Controllers\MatchController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\TeacherManagementController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MatchController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SudinController;
-use App\Http\Controllers\TeacherProfileController;
 use App\Http\Controllers\TeacherLifecycleController;
+use App\Http\Controllers\TeacherProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -48,6 +48,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('api/admin')->name('api.admin.
     Route::delete('/sudins/{sudin}', [SudinController::class, 'destroy']);
     Route::patch('/users/{user}/verify-email', [TeacherManagementController::class, 'verifyEmail'])
         ->name('users.verify-email');
+    Route::delete('/users/{user}', [TeacherManagementController::class, 'destroyUser'])
+        ->name('users.destroy');
     Route::patch('/teachers/{teacherProfile}/status', [TeacherManagementController::class, 'updateStatus'])
         ->name('teachers.status');
     Route::post('/profile-deletion-requests/{deletionRequest}/review', [TeacherManagementController::class, 'reviewDeletion'])

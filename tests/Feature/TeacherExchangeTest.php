@@ -2,15 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Mail\ReciprocalMatchFound;
 use App\Models\District;
 use App\Models\Sudin;
 use App\Models\TeacherProfile;
 use App\Models\User;
-use App\Mail\ReciprocalMatchFound;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -186,7 +186,7 @@ class TeacherExchangeTest extends TestCase
             ['id' => $userB->id, 'hash' => sha1($userB->email)],
         );
         $this->actingAs($userB)->get($verificationUrl)
-            ->assertRedirect(route('dashboard', absolute: false).'?verified=1');
+            ->assertRedirect(route('dashboard').'?verified=1');
 
         $this->actingAs($userB)->postJson('/api/profile', $this->profilePayload(
             $sudinB,
@@ -393,6 +393,69 @@ class TeacherExchangeTest extends TestCase
             ->assertDontSee('<svg', false);
     }
 
+    public function test_admin_can_permanently_delete_a_user_and_their_profile_data(): void
+    {
+        $origin = $this->district('31.71.01', 'Kecamatan A', '31.71', 'Kota Administrasi Jakarta Pusat');
+        $destination = $this->district('31.72.01', 'Kecamatan B', '31.72', 'Kota Administrasi Jakarta Utara');
+        $originSudin = $this->sudinFor($origin, 'Jakarta Pusat 1');
+        $this->sudinFor($destination, 'Jakarta Utara 1');
+        $user = $this->teacherUser('permanent-delete@example.test');
+        $this->createProfile($user, $originSudin, $origin, $destination, 'Guru Hapus', '081234567801');
+        $profile = $user->teacherProfile()->firstOrFail();
+        $profile->update(['is_mutated' => true]);
+        $this->actingAs($user)->postJson('/api/teacher-profile/deletion-request')->assertCreated();
+
+        $admin = User::factory()->create(['email' => 'admin@example.test']);
+        $admin->assignRole('admin');
+
+        $this->actingAs($admin)->deleteJson(route('api.admin.users.destroy', $user))
+            ->assertOk()
+            ->assertJsonPath('message', 'Akun user dan seluruh data profil terkait berhasil dihapus permanen.');
+
+        $this->assertModelMissing($user);
+        $this->assertModelMissing($profile);
+        $this->assertDatabaseMissing('profile_deletion_requests', ['requester_email' => 'permanent-delete@example.test']);
+        $this->assertDatabaseMissing('model_has_roles', ['model_id' => $user->id, 'model_type' => User::class]);
+    }
+
+    public function test_admin_cannot_permanently_delete_their_own_account(): void
+    {
+        $admin = User::factory()->create(['email' => 'admin@example.test']);
+        $admin->assignRole('admin');
+
+        $this->actingAs($admin)->deleteJson(route('api.admin.users.destroy', $admin))
+            ->assertConflict()
+            ->assertJsonPath('message', 'Kamu tidak dapat menghapus akun administrator yang sedang digunakan.');
+
+        $this->assertModelExists($admin);
+    }
+
+    public function test_non_admin_cannot_permanently_delete_a_user(): void
+    {
+        $teacher = $this->teacherUser('teacher@example.test');
+        $user = User::factory()->create(['email' => 'target@example.test']);
+
+        $this->actingAs($teacher)->deleteJson(route('api.admin.users.destroy', $user))
+            ->assertForbidden();
+
+        $this->assertModelExists($user);
+    }
+
+    public function test_admin_pages_link_back_to_admin_pages_instead_of_teacher_dashboard(): void
+    {
+        $admin = User::factory()->create(['email' => 'admin@example.test']);
+        $admin->assignRole('admin');
+
+        $this->actingAs($admin)->get('/admin/sudins')
+            ->assertOk()
+            ->assertSee('href="'.route('admin.users').'"', false)
+            ->assertDontSee('href="'.route('dashboard').'"', false);
+        $this->actingAs($admin)->get('/admin/users')
+            ->assertOk()
+            ->assertSee('href="'.route('admin.sudins').'"', false)
+            ->assertDontSee('href="'.route('dashboard').'"', false);
+    }
+
     public function test_teacher_profiles_only_match_when_sudin_destinations_are_reciprocal(): void
     {
         $originA = $this->district('31.71.01', 'Kecamatan A', '31.71', 'Kota Administrasi Jakarta Pusat');
@@ -507,7 +570,7 @@ class TeacherExchangeTest extends TestCase
         $this->actingAs($this->teacherUser('guru@example.test'))
             ->postJson('/api/profile', $payload)
             ->assertUnprocessable()
-        ->assertJsonPath('message', 'Semua kecamatan tujuan harus berada dalam cakupan Sudin tujuan yang dipilih.');
+            ->assertJsonPath('message', 'Semua kecamatan tujuan harus berada dalam cakupan Sudin tujuan yang dipilih.');
     }
 
     public function test_admin_can_create_a_sudin_and_assign_its_districts(): void

@@ -4,12 +4,9 @@
 
 @section('content')
 <div class="page-shell admin-shell">
-    <header class="topbar">
-        <a class="brand" href="{{ route('dashboard') }}"><span class="brand-mark">RT</span><span>Ruang Tukar Guru <small>Pengaturan admin</small></span></a>
-        <div class="account-actions"><span class="account-name">{{ auth()->user()->name }} · Admin</span><form method="POST" action="{{ route('logout') }}">@csrf<button class="quiet-link button-link" type="submit">Keluar <span aria-hidden="true">↗</span></button></form></div>
-    </header>
+    @include('partials.app-header')
     <main class="admin-main">
-        <a class="back-link" href="{{ route('dashboard') }}">← Kembali ke halaman utama</a>
+        <a class="back-link" href="{{ route('admin.users') }}">← Kembali ke daftar user</a>
         <section class="admin-intro"><p class="eyebrow">KONFIGURASI WILAYAH</p><h1>Atur cakupan Sudin</h1><p>Kelompokkan kecamatan ke Sudin yang menaunginya. Kecamatan hanya dapat dimasukkan ke satu Sudin.</p></section>
         <div class="admin-grid">
             <section class="panel sudin-form-panel">

@@ -58,6 +58,38 @@ class TeacherManagementController extends Controller
         ]);
     }
 
+    public function destroyUser(Request $request, User $user): JsonResponse
+    {
+        if ($request->user()->is($user)) {
+            return response()->json([
+                'message' => 'Kamu tidak dapat menghapus akun administrator yang sedang digunakan.',
+            ], 409);
+        }
+
+        DB::transaction(function () use ($user): void {
+            if ($user->hasRole('admin') && User::query()->role('admin')->count() <= 1) {
+                abort(409, 'Administrator terakhir tidak dapat dihapus.');
+            }
+
+            $profile = $user->teacherProfile()->withTrashed()->first();
+
+            if ($profile) {
+                $profile->deletionRequests()->delete();
+                $profile->forceDelete();
+            }
+
+            ProfileDeletionRequest::query()->where('requested_by', $user->id)->delete();
+            DB::table('sessions')->where('user_id', $user->id)->delete();
+            DB::table('password_reset_tokens')->where('email', $user->email)->delete();
+
+            $user->forceDelete();
+        });
+
+        return response()->json([
+            'message' => 'Akun user dan seluruh data profil terkait berhasil dihapus permanen.',
+        ]);
+    }
+
     public function updateStatus(Request $request, TeacherProfile $teacherProfile): JsonResponse
     {
         $data = $request->validate(['is_mutated' => ['required', 'boolean']]);

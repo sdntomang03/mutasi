@@ -6,7 +6,7 @@
 <div class="page-shell admin-shell">
     @include('partials.app-header')
     <main class="admin-main">
-        <a class="back-link" href="{{ route('dashboard') }}">← Kembali ke dashboard</a>
+        <a class="back-link" href="{{ route('admin.sudins') }}">← Pengaturan Sudin</a>
         <section class="admin-intro">
             <p class="eyebrow">PENGELOLAAN AKUN</p>
             <h1>Daftar user</h1>
@@ -31,6 +31,14 @@
                                 @endif
                             </div>
                             <span>{{ $profile ? $profile->school_name.' · '.$profile->district_name : 'Profil guru belum dibuat' }}</span>
+                            @unless (auth()->user()->is($user))
+                                <button
+                                    class="button button-danger admin-user-delete"
+                                    type="button"
+                                    data-delete-user="{{ route('api.admin.users.destroy', $user) }}"
+                                    data-user-email="{{ $user->email }}"
+                                >Hapus permanen</button>
+                            @endunless
                         </div>
                         @if ($profile)
                         <div class="admin-user-meta">
