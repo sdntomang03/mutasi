@@ -4,8 +4,10 @@ namespace Tests\Feature\Auth;
 
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
@@ -99,5 +101,21 @@ class EmailVerificationTest extends TestCase
         $this->get(route('verification.verify', ['id' => $user->id, 'hash' => sha1($user->email)]))->assertForbidden();
 
         $this->assertFalse($user->fresh()->hasVerifiedEmail());
+    }
+
+    public function test_verification_email_is_sent_in_indonesian(): void
+    {
+        Notification::fake();
+        $user = User::factory()->unverified()->create();
+
+        $user->sendEmailVerificationNotification();
+
+        Notification::assertSentTo($user, VerifyEmail::class, function (VerifyEmail $notification) use ($user) {
+            $mail = $notification->toMail($user);
+
+            return str_contains($mail->subject, 'Verifikasi Alamat Email')
+                && $mail->actionText === 'Verifikasi Alamat Email'
+                && str_contains($mail->actionUrl, 'verify-email/');
+        });
     }
 }

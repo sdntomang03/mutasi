@@ -15,7 +15,7 @@
             </div>
         </section>
         <section class="panel form-panel profile-form-panel">
-            @include('partials.teacher-profile-form')
+            @include('partials.teacher-profile-form', ['subjects' => \App\Models\Subject::query()->orderBy('name')->get()])
         </section>
         @if (auth()->user()->teacherProfile)
         @php($pendingDeletion = auth()->user()->teacherProfile->deletionRequests()->where('status', 'pending')->exists())

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Mail\ReciprocalMatchFound;
 use App\Models\District;
+use App\Models\Subject;
 use App\Models\Sudin;
 use App\Models\TeacherProfile;
 use App\Models\User;
@@ -780,6 +781,8 @@ class TeacherExchangeTest extends TestCase
             'level' => 'SD',
             'destination_position' => 'guru_kelas',
             'destination_levels' => ['SD'],
+            'subject_id' => Subject::query()->value('id'),
+            'destination_subject_ids' => [Subject::query()->value('id')],
             'school_name' => 'SDN Contoh',
             'school_address' => 'Jl. Contoh No. 1',
             'sudin_id' => $originSudin->id,

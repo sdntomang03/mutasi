@@ -44,8 +44,8 @@
                         <div class="admin-user-meta">
                             <span><small>Sudin asal</small>{{ $profile->sudin->name }}</span>
                             <span><small>Sudin tujuan</small>{{ $profile->destinationSudin?->name ?? 'Belum dipilih' }}</span>
-                            <span><small>Jabatan · jenjang asal</small>{{ $profile->position ? \App\Models\TeacherProfile::POSITIONS[$profile->position].' · '.$profile->level : 'Belum diisi' }}</span>
-                            <span><small>Jabatan · jenjang tujuan</small>{{ $profile->destination_position ? \App\Models\TeacherProfile::POSITIONS[$profile->destination_position].' · '.$profile->destinationLevels->pluck('level')->join(', ') : 'Belum diisi' }}</span>
+                            <span><small>Jabatan · jenjang asal</small>{{ $profile->position ? \App\Models\TeacherProfile::POSITIONS[$profile->position].' · '.$profile->level.($profile->subject ? ' · '.$profile->subject->name : '') : 'Belum diisi' }}</span>
+                            <span><small>Jabatan · jenjang tujuan</small>{{ $profile->destination_position ? \App\Models\TeacherProfile::POSITIONS[$profile->destination_position].' · '.$profile->destinationLevels->pluck('level')->join(', ').($profile->destination_position === 'guru_mapel' ? ' · '.$profile->destinationSubjects->pluck('name')->join(', ') : '') : 'Belum diisi' }}</span>
                             <label class="field"><span>Status mutasi</span>
                                 <select data-admin-mutation-status>
                                     <option value="0" @selected(! $profile->is_mutated)>Belum mutasi</option>

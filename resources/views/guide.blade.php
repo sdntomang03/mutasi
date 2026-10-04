@@ -29,11 +29,11 @@
                 <h2>Isi profil mutasi</h2>
                 <ul>
                     <li><strong>Data diri:</strong> nama, nomor HP, dan jenis kepegawaian (PNS, PPPK, atau KKI).</li>
-                    <li><strong>Jabatan dan jenjang:</strong> pilih jabatan (guru kelas atau guru mapel) dan <em>satu</em> jenjang sekolah asal (SD, SMP, SMA, atau SMK).</li>
+                    <li><strong>Jabatan dan jenjang:</strong> pilih jabatan (guru kelas atau guru mapel) dan <em>satu</em> jenjang sekolah asal (SD, SMP, SMA, atau SMK). Guru mapel juga memilih <em>mapel yang diampu</em>.</li>
                     <li><strong>Sekolah asal:</strong> nama sekolah, alamat, serta wilayah (provinsi selalu DKI Jakarta, lalu kota, kecamatan, dan kelurahan).</li>
                     <li><strong>Sudin asal</strong> ditentukan otomatis dari kecamatan sekolah asal, berdasarkan pengaturan admin.</li>
                     <li><strong>Tujuan mutasi:</strong> pilih Sudin tujuan, lalu pilih <em>semua kecamatan</em> atau <em>beberapa kecamatan</em> di Sudin tersebut.</li>
-                    <li><strong>Jabatan dan jenjang tujuan:</strong> guru mapel dapat memilih beberapa jenjang tujuan, guru kelas hanya satu jenjang.</li>
+                    <li><strong>Jabatan dan jenjang tujuan:</strong> guru mapel dapat memilih beberapa jenjang tujuan, guru kelas hanya satu jenjang. Bila tujuanmu guru mapel, pilih satu atau beberapa mapel tujuan (daftar mapel dikelola admin).</li>
                 </ul>
             </section>
 
@@ -48,6 +48,7 @@
                     <li>Jika tidak memilih kecamatan (semua kecamatan), syarat kecamatan pada sisi tersebut tidak dibatasi.</li>
                     <li>Jabatan tujuan A sama dengan jabatan B saat ini, dan sebaliknya (guru kelas dengan guru kelas, guru mapel dengan guru mapel).</li>
                     <li>Jenjang sekolah B termasuk dalam jenjang tujuan A, dan jenjang sekolah A termasuk dalam jenjang tujuan B.</li>
+                    <li>Untuk guru mapel: mapel yang diampu B termasuk dalam mapel tujuan A, dan mapel yang diampu A termasuk dalam mapel tujuan B. Guru kelas tidak memakai mapel.</li>
                 </ol>
                 <p class="muted-text">Contoh: A guru kelas SD di Jakarta Barat 1 dan ingin ke Jakarta Timur 2 (kecamatan Cakung) sebagai guru kelas SD. B guru kelas SD di Cakung dan ingin ke Jakarta Barat 1 sebagai guru kelas SD. Keduanya cocok. Bila B berjabatan guru mapel atau berjenjang SMP, keduanya tidak cocok.</p>
                 <p>Profil lama yang belum mengisi jabatan dan jenjang harus diperbarui lebih dulu. Profil <strong>tidak</strong> diikutkan dalam pencocokan bila: email belum terverifikasi, status sudah mutasi, ada pengajuan hapus yang menunggu admin, atau akun sudah dihapus.</p>

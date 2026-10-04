@@ -16,7 +16,7 @@ class MatchController extends Controller
         ]);
 
         $profile = $request->user()->teacherProfile()
-            ->with(['sudin:id,name', 'destinationSudin:id,name', 'destinationDistricts:code,name,regency_code,regency_name', 'destinationLevels'])
+            ->with(['sudin:id,name', 'destinationSudin:id,name', 'destinationDistricts:code,name,regency_code,regency_name', 'destinationLevels', 'destinationSubjects:id,name'])
             ->first();
         if (! $profile) {
             return response()->json(['message' => 'Simpan profil guru terlebih dahulu untuk mencari tukeran.'], 422);
@@ -24,6 +24,11 @@ class MatchController extends Controller
 
         if (! $profile->position || ! $profile->level || ! $profile->destination_position || $profile->destinationLevels->isEmpty()) {
             return response()->json(['message' => 'Lengkapi jabatan dan jenjang asal serta tujuan pada profil terlebih dahulu.'], 422);
+        }
+
+        if (($profile->position === 'guru_mapel' && ! $profile->subject_id)
+            || ($profile->destination_position === 'guru_mapel' && $profile->destinationSubjects->isEmpty())) {
+            return response()->json(['message' => 'Lengkapi mapel asal dan mapel tujuan pada profil terlebih dahulu.'], 422);
         }
 
         if (! $profile->destination_sudin_id) {
@@ -49,6 +54,7 @@ class MatchController extends Controller
                 'employment_type' => $candidate->employment_type,
                 'position' => $candidate->position,
                 'level' => $candidate->level,
+                'subject' => $candidate->subject?->name,
                 'school_name' => $candidate->school_name,
                 'school_address' => $candidate->school_address,
                 'sudin' => $candidate->sudin->name,
@@ -56,6 +62,7 @@ class MatchController extends Controller
                     'sudin' => $candidate->destinationSudin->name,
                     'position' => $candidate->destination_position,
                     'levels' => $candidate->destinationLevels->pluck('level')->values(),
+                    'subjects' => $candidate->destinationSubjects->pluck('name')->values(),
                     'districts' => $candidate->destinationDistricts->map(fn ($district) => [
                         'code' => $district->code,
                         'name' => $district->name,

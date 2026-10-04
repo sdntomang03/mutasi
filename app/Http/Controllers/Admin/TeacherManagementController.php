@@ -23,6 +23,8 @@ class TeacherManagementController extends Controller
                     'teacherProfile.sudin:id,name',
                     'teacherProfile.destinationSudin:id,name',
                     'teacherProfile.destinationLevels',
+                    'teacherProfile.subject:id,name',
+                    'teacherProfile.destinationSubjects:id,name',
                     'teacherProfile.deletionRequests' => fn ($query) => $query->where('status', 'pending'),
                 ])
                 ->latest()

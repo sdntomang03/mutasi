@@ -168,7 +168,19 @@
                 : 'Pilih jabatan tujuan terlebih dahulu. Guru mapel dapat memilih beberapa jenjang, guru kelas hanya satu jenjang.';
     }
 
-    $('#target-position').addEventListener('change', syncLevelRules);
+    const subjectBoxes = () => [...document.querySelectorAll('[data-target-subject]')];
+
+    // Mapel hanya relevan untuk guru mapel, baik di asal maupun di tujuan.
+    function syncSubjectFields() {
+        const originIsSubject = $('#origin-position').value === 'guru_mapel';
+        const targetIsSubject = $('#target-position').value === 'guru_mapel';
+        $('#origin-subject-field').hidden = !originIsSubject;
+        $('#origin-subject').required = originIsSubject;
+        $('#target-subject-field').hidden = !targetIsSubject;
+    }
+
+    $('#origin-position').addEventListener('change', syncSubjectFields);
+    $('#target-position').addEventListener('change', () => { syncLevelRules(); syncSubjectFields(); });
     $('#target-levels').addEventListener('change', (event) => {
         if ($('#target-position').value === 'guru_kelas' && event.target.checked) {
             levelBoxes().forEach((box) => { box.checked = box === event.target; });
@@ -180,7 +192,7 @@
             const profile = result.data;
             if (!profile) return;
 
-            for (const field of ['name', 'phone', 'employment_type', 'position', 'level', 'destination_position', 'school_name', 'school_address', 'sudin_id']) {
+            for (const field of ['name', 'phone', 'employment_type', 'position', 'level', 'destination_position', 'school_name', 'school_address', 'sudin_id', 'subject_id']) {
                 form.elements.namedItem(field).value = profile[field] ?? '';
             }
 
@@ -193,6 +205,9 @@
             const savedLevels = (profile.destination_levels || []).map((item) => item.level);
             levelBoxes().forEach((box) => { box.checked = savedLevels.includes(box.value); });
             syncLevelRules();
+            const savedSubjects = (profile.destination_subjects || []).map((item) => String(item.id));
+            subjectBoxes().forEach((box) => { box.checked = savedSubjects.includes(box.value); });
+            syncSubjectFields();
             destinationList.splice(0, destinationList.length);
             if (profile.destination_sudin_id) {
                 $('#target-sudin').value = String(profile.destination_sudin_id);
@@ -330,6 +345,12 @@
             return;
         }
 
+        const selectedSubjects = subjectBoxes().filter((box) => box.checked).map((box) => Number(box.value));
+        if ($('#target-position').value === 'guru_mapel' && !selectedSubjects.length) {
+            showToast('Pilih minimal satu mapel tujuan.', true);
+            return;
+        }
+
         const fields = new FormData(form);
         const payload = Object.fromEntries(fields.entries());
         payload.province_code = '31';
@@ -342,6 +363,8 @@
         payload.destination_sudin_id = destinationList[0].sudin_id;
         payload.destination_district_codes = destinationList[0].district_codes;
         payload.destination_levels = selectedLevels;
+        payload.destination_subject_ids = selectedSubjects;
+        payload.subject_id = $('#origin-position').value === 'guru_mapel' ? payload.subject_id : null;
 
         const submit = form.querySelector('[type="submit"]');
         submit.disabled = true;

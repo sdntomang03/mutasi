@@ -16,7 +16,7 @@ class TeacherProfileController extends Controller
     public function show(Request $request): JsonResponse
     {
         $profile = $request->user()->teacherProfile()
-            ->with(['destinationSudin:id,name', 'destinationDistricts:code,name,regency_code,regency_name', 'destinationLevels', 'sudin:id,name'])
+            ->with(['destinationSudin:id,name', 'destinationDistricts:code,name,regency_code,regency_name', 'destinationLevels', 'sudin:id,name', 'subject:id,name', 'destinationSubjects:id,name'])
             ->first();
 
         return response()->json([
@@ -42,6 +42,9 @@ class TeacherProfileController extends Controller
             'destination_position' => ['required', Rule::in(array_keys(TeacherProfile::POSITIONS))],
             'destination_levels' => ['required', 'array', 'min:1', 'max:'.count(TeacherProfile::LEVELS)],
             'destination_levels.*' => ['required', 'distinct', Rule::in(TeacherProfile::LEVELS)],
+            'subject_id' => ['nullable', 'integer', 'exists:subjects,id'],
+            'destination_subject_ids' => ['nullable', 'array', 'max:50'],
+            'destination_subject_ids.*' => ['integer', 'distinct', 'exists:subjects,id'],
             'destination_sudin_id' => ['required', 'integer', 'exists:sudins,id'],
             'destination_district_codes' => ['nullable', 'array', 'max:44'],
             'destination_district_codes.*' => ['required', 'string', 'distinct', 'regex:/^31\.\d{2}\.\d{2}$/', 'exists:districts,code'],
@@ -61,6 +64,15 @@ class TeacherProfileController extends Controller
 
         if ($data['destination_position'] === 'guru_kelas' && count($data['destination_levels']) !== 1) {
             return response()->json(['message' => 'Guru kelas hanya dapat memilih satu jenjang tujuan.'], 422);
+        }
+
+        $subjectId = $data['position'] === 'guru_mapel' ? ($data['subject_id'] ?? null) : null;
+        $destinationSubjectIds = $data['destination_position'] === 'guru_mapel' ? ($data['destination_subject_ids'] ?? []) : [];
+        if ($data['position'] === 'guru_mapel' && ! $subjectId) {
+            return response()->json(['message' => 'Pilih mapel yang kamu ampu.'], 422);
+        }
+        if ($data['destination_position'] === 'guru_mapel' && $destinationSubjectIds === []) {
+            return response()->json(['message' => 'Pilih minimal satu mapel tujuan.'], 422);
         }
 
         $phone = $this->normalizePhone($data['phone']);
@@ -87,7 +99,7 @@ class TeacherProfileController extends Controller
         }
 
         $wasCreated = $existingProfile === null;
-        $profile = DB::transaction(function () use ($data, $phone, $request, $existingProfile, $destinationDistrictCodes) {
+        $profile = DB::transaction(function () use ($data, $phone, $request, $existingProfile, $destinationDistrictCodes, $subjectId, $destinationSubjectIds) {
             $attributes = [
                 'name' => $data['name'],
                 'phone' => $phone,
@@ -97,6 +109,7 @@ class TeacherProfileController extends Controller
                 'sudin_id' => $data['sudin_id'],
                 'position' => $data['position'],
                 'level' => $data['level'],
+                'subject_id' => $subjectId,
                 'destination_position' => $data['destination_position'],
                 'destination_sudin_id' => $data['destination_sudin_id'],
                 'province_code' => '31',
@@ -117,13 +130,14 @@ class TeacherProfileController extends Controller
 
             $profile->destinationDistricts()->sync($destinationDistrictCodes);
             $profile->syncDestinationLevels($data['destination_levels']);
+            $profile->destinationSubjects()->sync($destinationSubjectIds);
 
             return $profile;
         });
         $matchNotifier->notifyFor($profile, $matchFinder);
 
         return response()->json([
-            'data' => $profile->load(['destinationSudin:id,name', 'destinationDistricts:code,name,regency_code,regency_name', 'destinationLevels', 'sudin:id,name']),
+            'data' => $profile->load(['destinationSudin:id,name', 'destinationDistricts:code,name,regency_code,regency_name', 'destinationLevels', 'sudin:id,name', 'subject:id,name', 'destinationSubjects:id,name']),
             'message' => $wasCreated
                 ? 'Profil tersimpan. Mencari guru yang cocok dua arah berdasarkan Sudin.'
                 : 'Profil berhasil diperbarui.',

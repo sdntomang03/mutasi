@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\MatchNotificationController;
+use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Admin\TeacherManagementController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MatchController;
@@ -39,6 +40,7 @@ Route::middleware(['auth', 'verified', 'role:guru'])->group(function () {
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::view('/sudins', 'admin.sudins')->name('sudins');
+    Route::view('/subjects', 'admin.subjects')->name('subjects');
     Route::get('/users', [TeacherManagementController::class, 'index'])->name('users');
     Route::get('/deletion-requests', [TeacherManagementController::class, 'deletionRequests'])->name('deletion-requests');
     Route::get('/match-notifications', [MatchNotificationController::class, 'index'])->name('match-notifications');
@@ -49,6 +51,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('api/admin')->name('api.admin.
     Route::post('/sudins', [SudinController::class, 'store']);
     Route::put('/sudins/{sudin}', [SudinController::class, 'update']);
     Route::delete('/sudins/{sudin}', [SudinController::class, 'destroy']);
+    Route::get('/subjects', [SubjectController::class, 'index']);
+    Route::post('/subjects', [SubjectController::class, 'store']);
+    Route::post('/subjects/import', [SubjectController::class, 'import']);
+    Route::put('/subjects/{subject}', [SubjectController::class, 'update']);
+    Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy']);
     Route::post('/match-notifications/scan', [MatchNotificationController::class, 'scan'])->name('match-notifications.scan');
     Route::post('/match-notifications/send-pending', [MatchNotificationController::class, 'sendPending'])->name('match-notifications.send-pending');
     Route::post('/match-notifications/{pair}/send', [MatchNotificationController::class, 'send'])->name('match-notifications.send');

@@ -9,16 +9,18 @@ class ReciprocalMatchFinder
 {
     public function forProfile(TeacherProfile $profile, ?string $candidateOriginDistrictCode = null): Collection
     {
-        $profile->load('destinationLevels');
+        $profile->load(['destinationLevels', 'destinationSubjects']);
         $destinationLevels = $profile->destinationLevels->pluck('level');
         if (! $profile->position || ! $profile->level || ! $profile->destination_position || $destinationLevels->isEmpty()
             || ! $profile->sudin_id || ! $profile->destination_sudin_id || $profile->is_mutated
+            || ($profile->position === 'guru_mapel' && ! $profile->subject_id)
+            || ($profile->destination_position === 'guru_mapel' && $profile->destinationSubjects->isEmpty())
             || $profile->deletionRequests()->where('status', 'pending')->exists()) {
             return new Collection;
         }
 
         return TeacherProfile::query()
-            ->with(['sudin:id,name', 'destinationSudin:id,name', 'destinationDistricts:code,name,regency_code,regency_name', 'destinationLevels', 'user:id,email'])
+            ->with(['sudin:id,name', 'destinationSudin:id,name', 'destinationDistricts:code,name,regency_code,regency_name', 'destinationLevels', 'destinationSubjects:id,name', 'subject:id,name', 'user:id,email'])
             ->whereNotNull('user_id')
             ->whereHas('user', fn ($user) => $user->whereNotNull('email_verified_at'))
             ->where('user_id', '!=', $profile->user_id)
@@ -30,6 +32,14 @@ class ReciprocalMatchFinder
             ->where('destination_position', $profile->position)
             ->whereIn('level', $destinationLevels)
             ->whereHas('destinationLevels', fn ($levels) => $levels->where('level', $profile->level))
+            ->when(
+                $profile->position === 'guru_mapel',
+                fn ($query) => $query->whereHas('destinationSubjects', fn ($subjects) => $subjects->where('subjects.id', $profile->subject_id)),
+            )
+            ->when(
+                $profile->destination_position === 'guru_mapel',
+                fn ($query) => $query->whereIn('subject_id', $profile->destinationSubjects->pluck('id')),
+            )
             ->when(
                 $profile->destinationDistricts->isNotEmpty(),
                 fn ($query) => $query->whereIn('district_code', $profile->destinationDistricts->pluck('code')),

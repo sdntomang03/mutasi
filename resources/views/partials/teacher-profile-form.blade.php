@@ -24,6 +24,14 @@
                 @endforeach
             </select>
         </label>
+        <label class="field" id="origin-subject-field" hidden><span>Mapel yang diampu</span>
+            <select name="subject_id" id="origin-subject">
+                <option value="">Pilih mapel</option>
+                @foreach ($subjects as $subject)
+                    <option value="{{ $subject->id }}">{{ $subject->name }}</option>
+                @endforeach
+            </select>
+        </label>
         <label class="field"><span>Sudin asal</span><select name="sudin_id" id="origin-sudin" required><option value="">Memuat Sudin...</option></select></label>
         <label class="field field-wide"><span>Nama sekolah asal</span><input name="school_name" required maxlength="160" placeholder="Contoh: SDN ..."></label>
         <label class="field field-wide"><span>Alamat sekolah asal</span><textarea name="school_address" required rows="2" maxlength="1000" placeholder="Alamat lengkap sekolah"></textarea></label>
@@ -56,6 +64,15 @@
                 @endforeach
             </div>
             <small class="field-help" id="target-level-help">Pilih jabatan tujuan terlebih dahulu. Guru mapel dapat memilih beberapa jenjang, guru kelas hanya satu jenjang.</small>
+        </fieldset>
+        <fieldset class="field level-field field-wide" id="target-subject-field" hidden>
+            <span>Mapel tujuan</span>
+            <div class="level-options">
+                @foreach ($subjects as $subject)
+                    <label class="level-option"><input type="checkbox" value="{{ $subject->id }}" data-target-subject> {{ $subject->name }}</label>
+                @endforeach
+            </div>
+            <small class="field-help">Pilih satu atau beberapa mapel yang ingin kamu ampu di sekolah tujuan.</small>
         </fieldset>
     </div>
     <div class="destination-builder">

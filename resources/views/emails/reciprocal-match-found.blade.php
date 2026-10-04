@@ -1,15 +1,24 @@
-<p>Halo {{ $teacherName }},</p>
+﻿<x-mail::message>
+# Calon Tukeran yang Cocok Ditemukan
 
-<p>
-    Ada calon tukeran guru yang cocok dengan rencana mutasimu:
-    <strong>{{ $matchedTeacherName }}</strong>.
-</p>
+Yth. {{ $teacherName }},
 
-<p>
-    Kecocokan Sudin: {{ $originSudin }} ↔ {{ $destinationSudin }}.
-    Masuk ke Ruang Tukar Guru untuk melihat informasi lebih lanjut dan menghubungi calon tukeran.
-</p>
+Kami menemukan guru lain yang rencana mutasinya saling sesuai dengan rencana Anda. Berikut ringkasannya:
 
-<p>Untuk menjaga privasi, email ini tidak memuat nomor telepon. Silakan login untuk melihat detail kontak.</p>
+<x-mail::panel>
+**Calon tukeran:** {{ $matchedTeacherName }}  
+**Sudin asal Anda:** {{ $originSudin }}  
+**Sudin tujuan Anda:** {{ $destinationSudin }}
+</x-mail::panel>
 
-<p>Ruang Tukar Guru DKI Jakarta</p>
+Kecocokan ditentukan secara dua arah berdasarkan Sudin, kecamatan, jabatan, dan jenjang pada profil masing-masing guru.
+
+<x-mail::button :url="$dashboardUrl">
+Lihat Calon Tukeran
+</x-mail::button>
+
+Demi menjaga privasi, email ini tidak memuat nomor telepon atau data kontak. Silakan masuk ke aplikasi untuk melihat detail dan menghubungi calon tukeran. Pastikan data profil Anda selalu terbarui, dan ubah status menjadi *Sudah mutasi* apabila proses tukeran telah selesai.
+
+Hormat kami,  
+Tim {{ config('app.name') }}
+</x-mail::message>

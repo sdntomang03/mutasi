@@ -28,6 +28,7 @@ class TeacherProfile extends Model
         'sudin_id',
         'position',
         'level',
+        'subject_id',
         'destination_position',
         'destination_sudin_id',
         'is_mutated',
@@ -82,6 +83,16 @@ class TeacherProfile extends Model
             $this->destinationLevels()->firstOrCreate(['level' => $level]);
         }
         $this->unsetRelation('destinationLevels');
+    }
+
+    public function subject(): BelongsTo
+    {
+        return $this->belongsTo(Subject::class);
+    }
+
+    public function destinationSubjects(): BelongsToMany
+    {
+        return $this->belongsToMany(Subject::class, 'teacher_destination_subjects')->withTimestamps();
     }
 
     public function destinations(): HasMany

@@ -21,18 +21,19 @@ class ReciprocalMatchFound extends Mailable
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'Ada calon tukeran guru yang cocok');
+        return new Envelope(subject: 'Calon Tukeran Guru yang Cocok Telah Ditemukan');
     }
 
     public function content(): Content
     {
         return new Content(
-            view: 'emails.reciprocal-match-found',
+            markdown: 'emails.reciprocal-match-found',
             with: [
                 'teacherName' => $this->teacherName,
                 'matchedTeacherName' => $this->matchedTeacherName,
                 'originSudin' => $this->originSudin,
                 'destinationSudin' => $this->destinationSudin,
+                'dashboardUrl' => route('dashboard'),
             ],
         );
     }
