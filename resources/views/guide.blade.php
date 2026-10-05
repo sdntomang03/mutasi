@@ -14,8 +14,9 @@
                 menjelaskan aturan pencocokan, status profil, dan notifikasi.</p>
         </section>
 
-        <div class="guide-grid">
-            <section class="panel guide-card">
+        <div class="guide-timeline" aria-label="Urutan penggunaan aplikasi">
+            <section class="panel guide-card guide-flow-step">
+                <span class="guide-step-marker" aria-hidden="true">01</span>
                 <p class="eyebrow">LANGKAH 1</p>
                 <h2>Daftar dan verifikasi email</h2>
                 <ul>
@@ -26,7 +27,8 @@
                 </ul>
             </section>
 
-            <section class="panel guide-card">
+            <section class="panel guide-card guide-flow-step">
+                <span class="guide-step-marker" aria-hidden="true">02</span>
                 <p class="eyebrow">LANGKAH 2</p>
                 <h2>Isi profil mutasi</h2>
                 <ul>
@@ -46,7 +48,8 @@
                 </ul>
             </section>
 
-            <section class="panel guide-card guide-wide">
+            <section class="panel guide-card guide-flow-step">
+                <span class="guide-step-marker" aria-hidden="true">03</span>
                 <p class="eyebrow">LANGKAH 3</p>
                 <h2>Aturan pencocokan</h2>
                 <p>Dua guru dianggap cocok bila <strong>saling menguntungkan</strong> (dua arah). Misalkan kamu
@@ -74,7 +77,8 @@
                     mutasi, ada pengajuan hapus yang menunggu admin, atau akun sudah dihapus.</p>
             </section>
 
-            <section class="panel guide-card">
+            <section class="panel guide-card guide-flow-step">
+                <span class="guide-step-marker" aria-hidden="true">04</span>
                 <p class="eyebrow">DASHBOARD</p>
                 <h2>Mencari tukeran</h2>
                 <ul>
@@ -84,7 +88,8 @@
                 </ul>
             </section>
 
-            <section class="panel guide-card">
+            <section class="panel guide-card guide-flow-step">
+                <span class="guide-step-marker" aria-hidden="true">05</span>
                 <p class="eyebrow">NOTIFIKASI</p>
                 <h2>Email otomatis</h2>
                 <ul>
@@ -95,7 +100,8 @@
                 </ul>
             </section>
 
-            <section class="panel guide-card guide-wide">
+            <section class="panel guide-card guide-flow-step">
+                <span class="guide-step-marker" aria-hidden="true">06</span>
                 <p class="eyebrow">STATUS PROFIL</p>
                 <h2>Sudah mutasi dan penghapusan profil</h2>
                 <ol>
@@ -111,7 +117,9 @@
                         (hanya bila belum ada pengajuan yang menunggu).</li>
                 </ol>
             </section>
+        </div>
 
+        <div class="guide-info-grid" aria-label="Informasi tambahan">
             <section class="panel guide-card guide-wide">
                 <p class="eyebrow">TENTANG APLIKASI</p>
                 <h2>Aplikasi unofficial</h2>

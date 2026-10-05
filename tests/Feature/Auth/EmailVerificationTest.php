@@ -10,6 +10,7 @@ use Illuminate\Mail\Markdown;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class EmailVerificationTest extends TestCase
@@ -57,6 +58,23 @@ class EmailVerificationTest extends TestCase
         Event::assertDispatched(Verified::class);
         $this->assertTrue($user->fresh()->hasVerifiedEmail());
         $response->assertRedirect(route('dashboard', absolute: false).'?verified=1');
+    }
+
+    public function test_admin_is_redirected_to_sudin_management_after_email_verification(): void
+    {
+        Role::findOrCreate('admin', 'web');
+        $admin = User::factory()->unverified()->create();
+        $admin->assignRole('admin');
+        $verificationUrl = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            ['id' => $admin->id, 'hash' => sha1($admin->email)]
+        );
+
+        $this->actingAs($admin)->get($verificationUrl)
+            ->assertRedirect(route('admin.sudins', absolute: false).'?verified=1');
+
+        $this->assertTrue($admin->fresh()->hasVerifiedEmail());
     }
 
     public function test_email_is_not_verified_with_invalid_hash(): void

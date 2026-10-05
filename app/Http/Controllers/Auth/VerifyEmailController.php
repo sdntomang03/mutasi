@@ -26,7 +26,7 @@ class VerifyEmailController extends Controller
 
         if ($request->user()?->is($user)) {
             return redirect()->to(($user->hasRole('admin')
-                ? route('admin.users', absolute: false)
+                ? route('admin.sudins', absolute: false)
                 : route('dashboard', absolute: false)).'?verified=1');
         }
 

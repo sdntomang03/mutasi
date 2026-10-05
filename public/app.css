@@ -723,3 +723,39 @@ body.modal-open { overflow: hidden; }
     .guide-card { transition: none; }
     .guide-card:hover { transform: none; }
 }
+.guide-timeline { position: relative; display: grid; gap: 18px; margin: 0 0 34px; }
+.guide-timeline::before {
+    position: absolute;
+    top: 25px;
+    bottom: 25px;
+    left: 22px;
+    width: 2px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, #10a675, #b6d8c7 75%, #dfe9e3);
+    content: '';
+}
+.guide-flow-step { position: relative; min-width: 0; margin-left: 70px; }
+.guide-flow-step .guide-step-marker {
+    position: absolute;
+    top: 24px;
+    left: -70px;
+    z-index: 1;
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    border: 4px solid #f5f8f6;
+    border-radius: 50%;
+    background: #0d755d;
+    box-shadow: 0 0 0 1px #a9d5be, 0 4px 10px rgba(13, 117, 93, .16);
+    color: #fff;
+    font: 800 13px 'Manrope', sans-serif;
+}
+.guide-info-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(14px, 2vw, 22px); }
+@media (max-width: 720px) {
+    .guide-timeline { gap: 14px; }
+    .guide-timeline::before { left: 17px; }
+    .guide-flow-step { margin-left: 52px; }
+    .guide-flow-step .guide-step-marker { top: 20px; left: -52px; width: 38px; height: 38px; font-size: 11px; }
+    .guide-info-grid { grid-template-columns: 1fr; gap: 14px; }
+}

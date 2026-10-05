@@ -18,7 +18,7 @@ Route::get('/', function () {
     }
 
     return auth()->user()->hasRole('admin')
-        ? redirect()->route('admin.users')
+        ? redirect()->route('admin.sudins')
         : redirect()->route('dashboard');
 })->name('welcome');
 Route::middleware('auth')->get('/akun/password', fn () => view('account-password'))->name('account.password');
