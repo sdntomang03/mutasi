@@ -199,9 +199,18 @@ class TeacherExchangeTest extends TestCase
         ))->assertCreated();
 
         Mail::assertSent(ReciprocalMatchFound::class, 2);
-        Mail::assertSent(ReciprocalMatchFound::class, fn (ReciprocalMatchFound $mail) => $mail->teacherName === 'Guru A'
-            && $mail->matchedTeacherName === 'Guru B'
-            && $mail->hasTo('guru-a@example.test'));
+        Mail::assertSent(ReciprocalMatchFound::class, function (ReciprocalMatchFound $mail): bool {
+            $mail->assertSeeInHtml('PENTING: APLIKASI UNOFFICIAL');
+            $mail->assertSeeInHtml('border-left: 6px solid #9a3412');
+            $mail->assertSeeInHtml('dibangun secara swadaya dan bersama-sama');
+            $mail->assertSeeInHtml('menjadi tanggung jawab Anda');
+            $mail->assertSeeInText('PENTING: APLIKASI UNOFFICIAL');
+            $mail->assertSeeInText('menjadi tanggung jawab Anda');
+
+            return $mail->teacherName === 'Guru A'
+                && $mail->matchedTeacherName === 'Guru B'
+                && $mail->hasTo('guru-a@example.test');
+        });
         Mail::assertSent(ReciprocalMatchFound::class, fn (ReciprocalMatchFound $mail) => $mail->teacherName === 'Guru B'
             && $mail->matchedTeacherName === 'Guru A'
             && $mail->hasTo('guru-b@example.test'));

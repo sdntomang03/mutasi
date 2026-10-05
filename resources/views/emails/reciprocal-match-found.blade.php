@@ -19,6 +19,8 @@ Lihat Calon Tukeran
 
 Demi menjaga privasi, email ini tidak memuat nomor telepon atau data kontak. Silakan masuk ke aplikasi untuk melihat detail dan menghubungi calon tukeran. Pastikan data profil Anda selalu terbarui, dan ubah status menjadi *Sudah mutasi* apabila proses tukeran telah selesai.
 
+<x-mail::unofficial-notice />
+
 Hormat kami,  
 Tim {{ config('app.name') }}
 </x-mail::message>

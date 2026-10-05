@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Mail\Markdown;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
@@ -112,10 +113,18 @@ class EmailVerificationTest extends TestCase
 
         Notification::assertSentTo($user, VerifyEmail::class, function (VerifyEmail $notification) use ($user) {
             $mail = $notification->toMail($user);
+            $html = (string) $mail->render();
+            $text = (string) app(Markdown::class)->renderText($mail->markdown, $mail->data());
 
             return str_contains($mail->subject, 'Verifikasi Alamat Email')
-                && $mail->actionText === 'Verifikasi Alamat Email'
-                && str_contains($mail->actionUrl, 'verify-email/');
+                && str_contains($html, 'Verifikasi Alamat Email')
+                && str_contains($html, 'verify-email/')
+                && str_contains($html, 'PENTING: APLIKASI UNOFFICIAL')
+                && str_contains($html, 'border-left: 6px solid #9a3412')
+                && str_contains($html, 'dibangun secara swadaya dan bersama-sama')
+                && str_contains($html, 'menjadi tanggung jawab Anda')
+                && str_contains($text, 'PENTING: APLIKASI UNOFFICIAL')
+                && str_contains($text, 'menjadi tanggung jawab Anda');
         });
     }
 }
