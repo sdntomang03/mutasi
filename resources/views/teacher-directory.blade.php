@@ -81,8 +81,8 @@
                         @endphp
                         <tr data-teacher-row data-origin="{{ $teacher->sudin_id }}"
                             data-destination="{{ $teacher->destination_sudin_id }}">
-                            <td data-order="{{ strtolower($teacher->name) }}">
-                                <strong>{{ $teacher->name }}</strong>
+                            <td data-order="{{ strtolower($teacher->maskedName()) }}">
+                                <strong>{{ $teacher->maskedName() }}</strong>
                                 <span class="dt-badge dt-badge-soft">{{ $teacher->employment_type }}</span>
                             </td>
                             <td data-order="{{ strtolower($teacher->sudin?->abbreviation ?: $teacher->sudin?->name) }}">
@@ -105,7 +105,7 @@
                                 <template id="teacher-modal-{{ $teacher->id }}">
                                     <div class="teacher-detail">
                                         <p class="eyebrow">{{ strtoupper($positionLabel) }}</p>
-                                        <h3>{{ $teacher->name }}</h3>
+                                        <h3>{{ $teacher->maskedName() }}</h3>
                                         <div class="teacher-detail-grid">
                                             <section>
                                                 <h4>Asal</h4>

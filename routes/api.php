@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\TeacherManagementController;
 use App\Http\Controllers\Api\TokenController;
 use App\Http\Controllers\MatchController;
 use App\Http\Controllers\SudinController;
+use App\Http\Controllers\TeacherDirectoryController;
 use App\Http\Controllers\TeacherLifecycleController;
 use App\Http\Controllers\TeacherProfileController;
 use Illuminate\Support\Facades\Route;
@@ -23,6 +24,7 @@ Route::middleware('auth:sanctum')->group(function (): void {
         Route::get('/sudins/{sudin}/districts/{district}/villages', [SudinController::class, 'villages']);
         Route::get('/profile', [TeacherProfileController::class, 'show']);
         Route::post('/profile', [TeacherProfileController::class, 'store'])->middleware('throttle:10,1');
+        Route::get('/teachers', [TeacherDirectoryController::class, 'apiIndex'])->name('api.teachers.index');
         Route::get('/matches', [MatchController::class, 'index'])->middleware('throttle:30,1');
         Route::patch('/teacher-profile/status', [TeacherLifecycleController::class, 'updateStatus']);
         Route::post('/teacher-profile/deletion-request', [TeacherLifecycleController::class, 'requestDeletion']);

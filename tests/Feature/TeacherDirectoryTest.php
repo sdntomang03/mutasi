@@ -55,7 +55,8 @@ class TeacherDirectoryTest extends TestCase
 
         $this->actingAs($me)->get('/daftar-guru')
             ->assertOk()
-            ->assertSee('Rekan Kelas')
+            ->assertSee('R***n K***s')
+            ->assertDontSee('Rekan Kelas')
             ->assertDontSee('Rekan Mapel')
             ->assertDontSee('Belum Verifikasi')
             ->assertDontSee('Saya Kelas')
@@ -64,7 +65,8 @@ class TeacherDirectoryTest extends TestCase
         $mapel = $this->teacher('Saya Mapel', 'guru_mapel', $a, $b);
         $this->actingAs($mapel)->get('/daftar-guru')
             ->assertOk()
-            ->assertSee('Rekan Mapel')
+            ->assertSee('R***n M***l')
+            ->assertDontSee('Rekan Mapel')
             ->assertDontSee('Rekan Kelas');
     }
 
@@ -80,5 +82,72 @@ class TeacherDirectoryTest extends TestCase
         $admin = User::factory()->create();
         $admin->assignRole(Role::findOrCreate('admin', 'web'));
         $this->actingAs($admin)->get('/daftar-guru')->assertForbidden();
+    }
+
+    public function test_api_lists_verified_unmutated_teachers_with_the_same_position_without_contact_details(): void
+    {
+        Role::findOrCreate('guru', 'web');
+        $a = $this->sudin('31.71.01', 'Sudin Alfa', 'SA');
+        $b = $this->sudin('31.72.01', 'Sudin Beta', 'SB');
+        $me = $this->teacher('Saya Kelas', 'guru_kelas', $a, $b);
+        $classTeacher = $this->teacher('Rekan Kelas', 'guru_kelas', $b, $a);
+        $mapelTeacher = $this->teacher('Rekan Mapel', 'guru_mapel', $b, $a);
+        $mapelMe = $this->teacher('Saya Mapel', 'guru_mapel', $a, $b);
+        $mapelTeacherTwo = $this->teacher('Rekan Mapel Dua', 'guru_mapel', $b, $a);
+        $unverifiedTeacher = $this->teacher('Belum Verifikasi', 'guru_kelas', $b, $a, false);
+        $mutatedTeacher = $this->teacher('Sudah Mutasi', 'guru_kelas', $b, $a);
+        $mutatedTeacher->teacherProfile->forceFill(['is_mutated' => true])->save();
+        $this->getJson('/api/teachers')->assertUnauthorized();
+
+        $response = $this->actingAs($me)->getJson('/api/teachers')
+            ->assertOk()
+            ->assertJsonPath('profile.position', 'guru_kelas')
+            ->assertJsonPath('profile.position_label', 'Guru kelas')
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $classTeacher->teacherProfile->id)
+            ->assertJsonPath('data.0.name', 'R***n K***s')
+            ->assertJsonPath('data.0.position', 'guru_kelas')
+            ->assertJsonPath('data.0.position_label', 'Guru kelas');
+
+        $this->assertStringNotContainsString('phone', $response->getContent());
+        $this->assertStringNotContainsString('Saya Kelas', $response->getContent());
+        $this->assertStringNotContainsString('Rekan Kelas', $response->getContent());
+        $this->assertStringNotContainsString('Rekan Mapel', $response->getContent());
+        $this->assertStringNotContainsString('Belum Verifikasi', $response->getContent());
+        $this->assertStringNotContainsString('Sudah Mutasi', $response->getContent());
+
+        $mapel = $this->actingAs($mapelMe)->getJson('/api/teachers')
+            ->assertOk()
+            ->assertJsonPath('profile.position', 'guru_mapel')
+            ->assertJsonCount(2, 'data')
+            ->assertJsonPath('data.0.id', $mapelTeacher->teacherProfile->id)
+            ->assertJsonPath('data.0.name', 'R***n M***l')
+            ->assertJsonPath('data.1.id', $mapelTeacherTwo->teacherProfile->id);
+
+        $this->assertStringNotContainsString('phone', $mapel->getContent());
+        $this->assertStringNotContainsString('Rekan Mapel', $mapel->getContent());
+    }
+
+    public function test_masked_name_preserves_first_and_last_characters_of_each_name_part(): void
+    {
+        $profile = new TeacherProfile(['name' => 'Martha Gunj']);
+
+        $this->assertSame('M****a G**j', $profile->maskedName());
+    }
+
+    public function test_api_requires_a_teacher_profile_with_a_position(): void
+    {
+        Role::findOrCreate('guru', 'web');
+        $user = User::factory()->create();
+        $user->assignRole('guru');
+
+        $this->actingAs($user)->getJson('/api/teachers')
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'Lengkapi jabatan pada profil terlebih dahulu untuk melihat daftar guru.');
+
+        $admin = User::factory()->create();
+        $admin->assignRole(Role::findOrCreate('admin', 'web'));
+
+        $this->actingAs($admin)->getJson('/api/teachers')->assertForbidden();
     }
 }

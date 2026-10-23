@@ -101,7 +101,7 @@ class ReciprocalMatchNotifier
     {
         return new ReciprocalMatchFound(
             $recipient->name,
-            $match->name,
+            $match->maskedName(),
             $recipient->sudin->name,
             $recipient->destinationSudin->name,
         );

@@ -43,6 +43,7 @@ Respons sukses berisi `data.token`, `data.token_type`, `data.abilities`, dan `da
 | `GET` | `/api/sudins/{sudin}/districts/{district}/villages` | Daftar kelurahan dalam kecamatan Sudin; data diambil dari layanan wilayah eksternal. |
 | `GET` | `/api/profile` | Profil guru saat ini; `data` bernilai `null` jika belum ada. |
 | `POST` | `/api/profile` | Membuat atau memperbarui profil. Batas 10 permintaan per menit. |
+| `GET` | `/api/teachers` | Daftar guru lain dengan jabatan asal sama seperti profil pemanggil. |
 | `GET` | `/api/matches` | Daftar calon tukeran yang cocok dua arah. Batas 30 permintaan per menit. |
 | `PATCH` | `/api/teacher-profile/status` | Memperbarui status mutasi profil. |
 | `POST` | `/api/teacher-profile/deletion-request` | Mengajukan penghapusan profil yang sudah mutasi. |
@@ -106,7 +107,11 @@ Profil baru mengembalikan `201 Created`; pembaruan mengembalikan `200 OK`. Data 
 
 ### Mencari kecocokan
 
-`GET /api/matches` dapat menerima query opsional `candidate_origin_district_code=31.75.07`. Kecamatan filter harus berada dalam Sudin tujuan pemanggil. Hasil hanya mencakup kecocokan dua arah berdasarkan Sudin, jabatan, jenjang, mapel, dan batas kecamatan; nomor kontak kandidat disertakan karena endpoint ini hanya dapat dipakai guru terautentikasi.
+`GET /api/matches` dapat menerima query opsional `candidate_origin_district_code=31.75.07`. Kecamatan filter harus berada dalam Sudin tujuan pemanggil. Hasil hanya mencakup kecocokan dua arah berdasarkan Sudin, jabatan, jenjang, mapel, dan batas kecamatan. Nama kandidat tetap disamarkan; nomor kontak disertakan hanya untuk kecocokan dua arah dan karena endpoint ini hanya dapat dipakai guru terautentikasi.
+
+### Daftar guru dengan jabatan yang sama
+
+`GET /api/teachers` mengembalikan guru lain yang `position`-nya sama dengan jabatan saat ini pada profil pemanggil (`guru_kelas` atau `guru_mapel`). Hasil mengecualikan profil sendiri, guru yang sudah mutasi, dan akun yang emailnya belum terverifikasi. Endpoint ini berbeda dari `/api/matches`: daftar ini tidak mensyaratkan kecocokan dua arah. Nama guru lain disamarkan dengan mempertahankan huruf pertama dan terakhir setiap bagian nama (contoh `M****a G**j`). Nomor telepon, email, dan alamat sekolah tidak disertakan; profil dan jabatan harus sudah dilengkapi.
 
 ### Status dan pengajuan penghapusan
 

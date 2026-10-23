@@ -208,11 +208,11 @@ class TeacherExchangeTest extends TestCase
             $mail->assertSeeInText('menjadi tanggung jawab Anda');
 
             return $mail->teacherName === 'Guru A'
-                && $mail->matchedTeacherName === 'Guru B'
+                && $mail->matchedTeacherName === 'G**u *'
                 && $mail->hasTo('guru-a@example.test');
         });
         Mail::assertSent(ReciprocalMatchFound::class, fn (ReciprocalMatchFound $mail) => $mail->teacherName === 'Guru B'
-            && $mail->matchedTeacherName === 'Guru A'
+            && $mail->matchedTeacherName === 'G**u *'
             && $mail->hasTo('guru-b@example.test'));
 
         $payload = $this->profilePayload($sudinB, $originB, $originA, 'Guru B', '081234567802');
@@ -273,7 +273,8 @@ class TeacherExchangeTest extends TestCase
         $this->actingAs($userA)->get('/dashboard')
             ->assertOk()
             ->assertSee('Calon tukeran')
-            ->assertSee('Guru B')
+            ->assertSee('G**u *')
+            ->assertDontSee('Guru B')
             ->assertSee('+6281234567802');
         $this->actingAs($userA)->get('/teacher-profile')
             ->assertOk()
@@ -535,7 +536,7 @@ class TeacherExchangeTest extends TestCase
 
         $this->actingAs($userA)->getJson('/api/matches')
             ->assertOk()
-            ->assertJsonPath('data.0.name', 'Guru B')
+            ->assertJsonPath('data.0.name', 'G**u *')
             ->assertJsonPath('data.0.phone', '+6281234567802');
 
         $this->actingAs($userA)->getJson('/api/sudins/'.$sudinB->id.'/districts')
@@ -546,12 +547,12 @@ class TeacherExchangeTest extends TestCase
         $this->actingAs($userA)->getJson('/api/matches?candidate_origin_district_code='.$originB->code)
             ->assertOk()
             ->assertJsonCount(2, 'data')
-            ->assertJsonPath('data.0.name', 'Guru B');
+            ->assertJsonPath('data.0.name', 'G**u *');
 
         $this->actingAs($userA)->getJson('/api/matches?candidate_origin_district_code='.$otherDistrictInSudinB->code)
             ->assertOk()
             ->assertJsonCount(1, 'data')
-            ->assertJsonPath('data.0.name', 'Guru D');
+            ->assertJsonPath('data.0.name', 'G**u *');
         $this->actingAs($userA)->getJson('/api/matches')
             ->assertOk()
             ->assertJsonMissing(['name' => 'Guru E']);
@@ -729,7 +730,7 @@ class TeacherExchangeTest extends TestCase
             return collect($this->actingAs($userA)->getJson('/api/matches')->json('data'))->pluck('name')->all();
         };
 
-        $this->assertSame(['Guru B'], $matchNames(['position' => 'guru_mapel', 'level' => 'SMA', 'destination_position' => 'guru_mapel', 'destination_levels' => ['SMP', 'SD']]));
+        $this->assertSame(['G**u *'], $matchNames(['position' => 'guru_mapel', 'level' => 'SMA', 'destination_position' => 'guru_mapel', 'destination_levels' => ['SMP', 'SD']]));
         $this->assertSame([], $matchNames(['position' => 'guru_kelas', 'level' => 'SMA', 'destination_position' => 'guru_mapel', 'destination_levels' => ['SMP']]));
         $this->assertSame([], $matchNames(['position' => 'guru_mapel', 'level' => 'SD', 'destination_position' => 'guru_mapel', 'destination_levels' => ['SMP']]));
         $this->assertSame([], $matchNames(['position' => 'guru_mapel', 'level' => 'SMA', 'destination_position' => 'guru_mapel', 'destination_levels' => ['SD']]));

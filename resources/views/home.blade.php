@@ -75,7 +75,7 @@
                             @php($phoneDigits = preg_replace('/\D/', '', $candidate->phone))
                             <article class="match-card">
                                 <div class="match-card-top">
-                                    <div><p class="eyebrow">COCOK DUA ARAH</p><h3>{{ $candidate->name }}</h3></div>
+                                    <div><p class="eyebrow">COCOK DUA ARAH</p><h3>{{ $candidate->maskedName() }}</h3></div>
                                     <span class="type-pill">{{ $candidate->employment_type }}</span>
                                 </div>
                                 <p class="match-school">{{ $candidate->school_name }} <span>·</span> {{ $candidate->sudin->abbreviation ?: $candidate->sudin->name }}</p>

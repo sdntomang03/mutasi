@@ -49,7 +49,7 @@ class MatchController extends Controller
         $matches = $profiles
             ->map(fn (TeacherProfile $candidate) => [
                 'id' => $candidate->id,
-                'name' => $candidate->name,
+                'name' => $candidate->maskedName(),
                 'phone' => $candidate->phone,
                 'employment_type' => $candidate->employment_type,
                 'position' => $candidate->position,

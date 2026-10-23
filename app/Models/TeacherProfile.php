@@ -46,6 +46,22 @@ class TeacherProfile extends Model
         return ['is_mutated' => 'boolean'];
     }
 
+    public function maskedName(): string
+    {
+        return preg_replace_callback('/\S+/u', static function (array $matches): string {
+            $word = $matches[0];
+            $length = mb_strlen($word);
+
+            if ($length <= 2) {
+                return str_repeat('*', $length);
+            }
+
+            return mb_substr($word, 0, 1)
+                .str_repeat('*', $length - 2)
+                .mb_substr($word, -1);
+        }, $this->name) ?? $this->name;
+    }
+
     public function sudin(): BelongsTo
     {
         return $this->belongsTo(Sudin::class);
