@@ -45,8 +45,8 @@ Respons sukses berisi `data.token`, `data.token_type`, `data.abilities`, dan `da
 | `POST` | `/api/profile` | Membuat atau memperbarui profil. Batas 10 permintaan per menit. |
 | `GET` | `/api/teachers` | Daftar guru lain dengan jabatan asal sama seperti profil pemanggil. |
 | `GET` | `/api/matches` | Daftar calon tukeran yang cocok dua arah. Batas 30 permintaan per menit. |
-| `PATCH` | `/api/teacher-profile/status` | Memperbarui status mutasi profil. |
-| `POST` | `/api/teacher-profile/deletion-request` | Mengajukan penghapusan profil yang sudah mutasi. |
+| `PATCH` | `/api/teacher-profile/status` | Memperbarui status tukeran profil. |
+| `POST` | `/api/teacher-profile/deletion-request` | Mengajukan penghapusan profil setelah tukeran selesai. |
 
 ### Kecamatan dan kelurahan Sudin
 
@@ -142,7 +142,7 @@ Semua endpoint berikut memerlukan peran `admin`.
 | `PATCH` | `/api/admin/users/{user}/verify-email` | Verifikasi email user. |
 | `PATCH` | `/api/admin/users/{user}/reset-password` | Kirim tautan reset password ke email user; tidak menetapkan password bersama. |
 | `DELETE` | `/api/admin/users/{user}` | Hapus permanen akun dan data profil terkait; tidak dapat menghapus diri sendiri atau admin terakhir. |
-| `PATCH` | `/api/admin/teachers/{teacherProfile}/status` | Ubah status mutasi profil guru. |
+| `PATCH` | `/api/admin/teachers/{teacherProfile}/status` | Ubah status tukeran profil guru. |
 | `POST` | `/api/admin/profile-deletion-requests/{deletionRequest}/review` | Tinjau pengajuan penghapusan. |
 | `POST` | `/api/admin/match-notifications/scan` | Cari kecocokan baru dan kirim notifikasi email. |
 | `POST` | `/api/admin/match-notifications/send-pending` | Kirim semua notifikasi yang masih tertunda. |

@@ -618,7 +618,7 @@ body.modal-open { overflow: hidden; }
     .account-info, .account-caret { display: none; }
     .account-menu summary { padding: 3px; }
 }
-/* Alur mutasi */
+/* Alur tukeran */
 .flow-card { margin-top: 24px; padding: 26px; }
 .flow-head h2 { margin: 0 0 6px; font: 800 20px 'Manrope', sans-serif; letter-spacing: -.04em; }
 .flow-head p:last-child { margin: 0 0 22px; color: var(--muted); font-size: 12px; line-height: 1.6; }

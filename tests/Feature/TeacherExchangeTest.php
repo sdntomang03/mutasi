@@ -32,7 +32,7 @@ class TeacherExchangeTest extends TestCase
 
     public function test_guest_is_required_to_login_before_using_the_application(): void
     {
-        $this->get('/')->assertOk()->assertSee('Ruang Tukar Guru');
+        $this->get('/')->assertOk()->assertSee('Cari Tukeran Guru');
         $this->get('/dashboard')->assertRedirect('/login');
         $this->get('/admin/login')->assertRedirect('/login');
         $this->getJson('/api/sudins')->assertUnauthorized();
@@ -281,6 +281,7 @@ class TeacherExchangeTest extends TestCase
             ->assertOk()
             ->assertSee('Cari Tukeran Guru')
             ->assertSee('Profil tukeran')
+            ->assertSee('Belum tukeran')
             ->assertSee('profile-form')
             ->assertSee('value="PNS"', false)
             ->assertDontSee('PPPK')
