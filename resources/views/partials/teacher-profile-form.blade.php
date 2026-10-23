@@ -63,7 +63,7 @@
                     <label class="level-option"><input type="checkbox" value="{{ $level }}" data-target-level> {{ $level }}</label>
                 @endforeach
             </div>
-            <small class="field-help" id="target-level-help">Pilih jabatan tujuan terlebih dahulu. Guru mapel dapat memilih beberapa jenjang, guru kelas hanya satu jenjang.</small>
+            <small class="field-help" id="target-level-help">Pilih jabatan tujuan terlebih dahulu. Guru kelas hanya dapat memilih SD; guru mapel dapat memilih beberapa jenjang.</small>
         </fieldset>
         <fieldset class="field level-field field-wide" id="target-subject-field" hidden>
             <span>Mapel tujuan</span>

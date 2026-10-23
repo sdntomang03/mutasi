@@ -197,18 +197,20 @@
 
     const levelBoxes = () => [...document.querySelectorAll('[data-target-level]')];
 
-    // Guru kelas hanya boleh satu jenjang tujuan; guru mapel boleh beberapa.
+    // Guru kelas hanya dapat memilih SD; guru mapel dapat memilih beberapa jenjang.
     function syncLevelRules() {
         const isClassTeacher = $('#target-position').value === 'guru_kelas';
-        const checked = levelBoxes().filter((box) => box.checked);
-        if (isClassTeacher && checked.length > 1) {
-            checked.slice(1).forEach((box) => { box.checked = false; });
-        }
+        levelBoxes().forEach((box) => {
+            const isElementary = box.value === 'SD';
+            box.closest('.level-option').hidden = isClassTeacher && !isElementary;
+            box.disabled = isClassTeacher && !isElementary;
+            if (isClassTeacher) box.checked = isElementary;
+        });
         $('#target-level-help').textContent = isClassTeacher
-            ? 'Guru kelas hanya dapat memilih satu jenjang tujuan.'
+            ? 'Untuk guru kelas, jenjang tujuan ditetapkan SD.'
             : $('#target-position').value === 'guru_mapel'
                 ? 'Guru mapel dapat memilih satu atau beberapa jenjang tujuan.'
-                : 'Pilih jabatan tujuan terlebih dahulu. Guru mapel dapat memilih beberapa jenjang, guru kelas hanya satu jenjang.';
+                : 'Pilih jabatan tujuan terlebih dahulu. Guru kelas hanya dapat memilih SD; guru mapel dapat memilih beberapa jenjang.';
     }
 
     const subjectBoxes = () => [...document.querySelectorAll('[data-target-subject]')];
@@ -224,11 +226,6 @@
 
     $('#origin-position').addEventListener('change', syncSubjectFields);
     $('#target-position').addEventListener('change', () => { syncLevelRules(); syncSubjectFields(); });
-    $('#target-levels').addEventListener('change', (event) => {
-        if ($('#target-position').value === 'guru_kelas' && event.target.checked) {
-            levelBoxes().forEach((box) => { box.checked = box === event.target; });
-        }
-    });
     async function loadExistingProfile() {
         try {
             const result = await api('/profile');

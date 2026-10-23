@@ -678,7 +678,7 @@ class TeacherExchangeTest extends TestCase
         $this->actingAs($admin)->get(route('guide'))->assertForbidden();
     }
 
-    public function test_class_teacher_destination_allows_one_level_while_subject_teacher_allows_several(): void
+    public function test_class_teacher_destination_requires_sd_while_subject_teacher_allows_several_levels(): void
     {
         $originA = $this->district('31.71.01', 'Kecamatan A', '31.71', 'Kota Administrasi Jakarta Pusat');
         $originB = $this->district('31.72.01', 'Kecamatan B', '31.72', 'Kota Administrasi Jakarta Utara');
@@ -687,8 +687,10 @@ class TeacherExchangeTest extends TestCase
         $user = $this->teacherUser('levels@example.test');
         $payload = $this->profilePayload($sudinA, $originA, $originB);
 
+        $this->actingAs($user)->postJson('/api/profile', [...$payload, 'destination_levels' => ['SMP']])
+            ->assertJsonValidationErrors('destination_levels.0');
         $this->actingAs($user)->postJson('/api/profile', [...$payload, 'destination_levels' => ['SD', 'SMP']])
-            ->assertUnprocessable();
+            ->assertJsonValidationErrors('destination_levels.1');
         $this->actingAs($user)->postJson('/api/profile', [...$payload, 'level' => 'TK'])
             ->assertJsonValidationErrors('level');
         $this->actingAs($user)->postJson('/api/profile', [...$payload, 'destination_levels' => []])
@@ -731,7 +733,7 @@ class TeacherExchangeTest extends TestCase
         $this->assertSame([], $matchNames(['position' => 'guru_kelas', 'level' => 'SMA', 'destination_position' => 'guru_mapel', 'destination_levels' => ['SMP']]));
         $this->assertSame([], $matchNames(['position' => 'guru_mapel', 'level' => 'SD', 'destination_position' => 'guru_mapel', 'destination_levels' => ['SMP']]));
         $this->assertSame([], $matchNames(['position' => 'guru_mapel', 'level' => 'SMA', 'destination_position' => 'guru_mapel', 'destination_levels' => ['SD']]));
-        $this->assertSame([], $matchNames(['position' => 'guru_mapel', 'level' => 'SMA', 'destination_position' => 'guru_kelas', 'destination_levels' => ['SMP']]));
+        $this->assertSame([], $matchNames(['position' => 'guru_mapel', 'level' => 'SMA', 'destination_position' => 'guru_kelas', 'destination_levels' => ['SD']]));
     }
 
     private function teacherUser(string $email): User

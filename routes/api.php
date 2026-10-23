@@ -20,6 +20,7 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::middleware(['verified', 'role:guru', 'abilities:guru'])->group(function (): void {
         Route::get('/sudins', [SudinController::class, 'publicIndex']);
         Route::get('/sudins/{sudin}/districts', [SudinController::class, 'districts']);
+        Route::get('/sudins/{sudin}/districts/{district}/villages', [SudinController::class, 'villages']);
         Route::get('/profile', [TeacherProfileController::class, 'show']);
         Route::post('/profile', [TeacherProfileController::class, 'store'])->middleware('throttle:10,1');
         Route::get('/matches', [MatchController::class, 'index'])->middleware('throttle:30,1');

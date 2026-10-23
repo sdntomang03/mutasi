@@ -29,7 +29,7 @@ Respons sukses berisi `data.token`, `data.token_type`, `data.abilities`, dan `da
 - Respons sukses umumnya membungkus hasil dalam properti `data`; beberapa operasi juga mengembalikan `message`.
 - Validasi mengembalikan `422` dengan `message` dan `errors`. Konflik keadaan data mengembalikan `409`.
 - Token tidak valid/kedaluwarsa mengembalikan `401`; role atau ability yang tidak sesuai mengembalikan `403`.
-- Email reset yang dibatasi mengembalikan `429`. Kegagalan pengiriman email kecocokan dapat mengembalikan `502`.
+- Email reset yang dibatasi mengembalikan `429`. Kegagalan pengiriman email kecocokan atau layanan data kelurahan dapat mengembalikan `502`.
 - API belum memiliki prefix versi atau pagination.
 
 ## API guru
@@ -40,11 +40,16 @@ Respons sukses berisi `data.token`, `data.token_type`, `data.abilities`, dan `da
 | `DELETE` | `/api/logout` | Cabut token Bearer yang sedang dipakai. |
 | `GET` | `/api/sudins` | Daftar Sudin untuk guru. |
 | `GET` | `/api/sudins/{sudin}/districts` | Daftar kecamatan dalam Sudin. |
+| `GET` | `/api/sudins/{sudin}/districts/{district}/villages` | Daftar kelurahan dalam kecamatan Sudin; data diambil dari layanan wilayah eksternal. |
 | `GET` | `/api/profile` | Profil guru saat ini; `data` bernilai `null` jika belum ada. |
 | `POST` | `/api/profile` | Membuat atau memperbarui profil. Batas 10 permintaan per menit. |
 | `GET` | `/api/matches` | Daftar calon tukeran yang cocok dua arah. Batas 30 permintaan per menit. |
 | `PATCH` | `/api/teacher-profile/status` | Memperbarui status mutasi profil. |
 | `POST` | `/api/teacher-profile/deletion-request` | Mengajukan penghapusan profil yang sudah mutasi. |
+
+### Kecamatan dan kelurahan Sudin
+
+Gunakan `GET /api/sudins/{sudin}/districts` untuk daftar kecamatan Sudin. Untuk memuat kelurahan dari kecamatan tertentu, kirim `GET /api/sudins/{sudin}/districts/{district}/villages`; `{district}` adalah kode kecamatan seperti `31.75.07`. Kedua endpoint memerlukan Bearer token guru. Endpoint kelurahan hanya menerima kecamatan yang terdaftar pada Sudin tersebut dan mengembalikan `502` bila layanan data wilayah sedang tidak tersedia.
 
 ### Membuat atau memperbarui profil
 
@@ -62,7 +67,7 @@ Respons sukses berisi `data.token`, `data.token_type`, `data.abilities`, dan `da
 | `level` | `SD`, `SMP`, `SMA`, atau `SMK` |
 | `subject_id` | opsional; wajib jika `position` adalah `guru_mapel` |
 | `destination_position` | `guru_kelas` atau `guru_mapel` |
-| `destination_levels` | array jenjang tujuan; wajib, minimal satu. Untuk `guru_kelas`, tepat satu jenjang |
+| `destination_levels` | array jenjang tujuan; wajib, minimal satu. Untuk `guru_kelas`, harus hanya `SD`; `guru_mapel` dapat memilih beberapa jenjang |
 | `destination_subject_ids` | opsional; minimal satu ID jika posisi tujuan `guru_mapel` |
 | `destination_sudin_id` | ID Sudin tujuan |
 | `destination_district_codes` | opsional; array kode kecamatan tujuan. Kosong/tidak dikirim berarti semua kecamatan dalam Sudin tujuan |

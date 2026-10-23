@@ -41,7 +41,11 @@ class TeacherProfileController extends Controller
             'level' => ['required', Rule::in(TeacherProfile::LEVELS)],
             'destination_position' => ['required', Rule::in(array_keys(TeacherProfile::POSITIONS))],
             'destination_levels' => ['required', 'array', 'min:1', 'max:'.count(TeacherProfile::LEVELS)],
-            'destination_levels.*' => ['required', 'distinct', Rule::in(TeacherProfile::LEVELS)],
+            'destination_levels.*' => [
+                'required',
+                'distinct',
+                Rule::in($request->input('destination_position') === 'guru_kelas' ? ['SD'] : TeacherProfile::LEVELS),
+            ],
             'subject_id' => ['nullable', 'integer', 'exists:subjects,id'],
             'destination_subject_ids' => ['nullable', 'array', 'max:50'],
             'destination_subject_ids.*' => ['integer', 'distinct', 'exists:subjects,id'],
@@ -60,10 +64,6 @@ class TeacherProfileController extends Controller
         if (! str_starts_with($data['district_code'], $data['regency_code'].'.')
             || ! str_starts_with($data['village_code'], $data['district_code'].'.')) {
             return response()->json(['message' => 'Wilayah asal sekolah tidak sesuai hierarki DKI Jakarta.'], 422);
-        }
-
-        if ($data['destination_position'] === 'guru_kelas' && count($data['destination_levels']) !== 1) {
-            return response()->json(['message' => 'Guru kelas hanya dapat memilih satu jenjang tujuan.'], 422);
         }
 
         $subjectId = $data['position'] === 'guru_mapel' ? ($data['subject_id'] ?? null) : null;

@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\District;
 use App\Models\Sudin;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\Rule;
 
 class SudinController extends Controller
@@ -25,6 +27,53 @@ class SudinController extends Controller
             'data' => $sudin->districts()
                 ->orderBy('name')
                 ->get(['districts.code as id', 'districts.name', 'districts.regency_code', 'districts.regency_name']),
+        ]);
+    }
+
+    public function villages(Sudin $sudin, District $district): JsonResponse
+    {
+        abort_unless(
+            $sudin->districts()->where('districts.code', $district->code)->exists(),
+            404,
+        );
+
+        try {
+            $response = Http::connectTimeout(3)
+                ->timeout(8)
+                ->get("https://www.emsifa.com/api-wilayah-indonesia/v2/villages/{$district->code}.json");
+        } catch (ConnectionException $exception) {
+            report($exception);
+
+            return response()->json(['message' => 'Data kelurahan sementara tidak dapat diakses.'], 502);
+        }
+
+        $villages = $response->json('data');
+        if (! $response->successful() || ! is_array($villages)) {
+            return response()->json(['message' => 'Data kelurahan sementara tidak dapat diakses.'], 502);
+        }
+
+        foreach ($villages as $village) {
+            if (! is_array($village)
+                || ! isset($village['id'], $village['name'])
+                || ! is_string($village['id'])
+                || ! is_string($village['name'])
+                || ! str_starts_with($village['id'], $district->code.'.')) {
+                return response()->json(['message' => 'Sumber data kelurahan mengembalikan format yang tidak valid.'], 502);
+            }
+        }
+
+        return response()->json([
+            'sudin' => ['id' => $sudin->id, 'name' => $sudin->name, 'abbreviation' => $sudin->abbreviation],
+            'district' => [
+                'id' => $district->code,
+                'name' => $district->name,
+                'regency_code' => $district->regency_code,
+                'regency_name' => $district->regency_name,
+            ],
+            'data' => collect($villages)->map(fn (array $village): array => [
+                'id' => $village['id'],
+                'name' => $village['name'],
+            ])->values(),
         ]);
     }
 
