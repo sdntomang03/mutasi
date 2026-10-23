@@ -48,7 +48,7 @@
             } else if (verifyEmailButton) {
                 result = await request(verifyEmailButton.dataset.verifyUserEmail, 'PATCH', {});
             } else if (resetPasswordButton) {
-                if (!window.confirm(`Reset password ${resetPasswordButton.dataset.userEmail} menjadi "password"?`)) {
+                if (!window.confirm(`Kirim tautan reset password ke ${resetPasswordButton.dataset.userEmail}?`)) {
                     button.disabled = false;
                     return;
                 }

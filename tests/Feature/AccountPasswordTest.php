@@ -3,8 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -41,17 +43,25 @@ class AccountPasswordTest extends TestCase
         $this->assertTrue(Hash::check('baru-12345', $guru->fresh()->password));
     }
 
-    public function test_only_admin_can_reset_another_users_password_to_password(): void
+    public function test_only_admin_can_send_another_users_password_reset_link(): void
     {
+        Notification::fake();
+
         $admin = $this->user('admin');
         $guru = $this->user('guru');
         $other = $this->user('guru');
+        $guruPassword = $guru->getAuthPassword();
 
         $this->actingAs($other)->patchJson(route('api.admin.users.reset-password', $guru))->assertForbidden();
         $this->assertTrue(Hash::check('lama-12345', $guru->fresh()->password));
 
-        $this->actingAs($admin)->patchJson(route('api.admin.users.reset-password', $guru))->assertOk();
-        $this->assertTrue(Hash::check('password', $guru->fresh()->password));
+        $response = $this->actingAs($admin)
+            ->patchJson(route('api.admin.users.reset-password', $guru));
+        $response
+            ->assertOk()
+            ->assertJsonPath('message', 'Tautan reset password telah dikirim ke email user.');
+        Notification::assertSentTo($guru, ResetPassword::class);
+        $this->assertSame($guruPassword, $guru->fresh()->getAuthPassword());
 
         $this->actingAs($admin)->patchJson(route('api.admin.users.reset-password', $admin))->assertStatus(409);
         $this->assertTrue(Hash::check('lama-12345', $admin->fresh()->password));
