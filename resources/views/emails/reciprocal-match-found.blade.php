@@ -3,7 +3,7 @@
 
 Yth. {{ $teacherName }},
 
-Kami menemukan guru lain yang rencana mutasinya saling sesuai dengan rencana Anda. Berikut ringkasannya:
+Kami menemukan guru lain yang rencana tukerannya saling sesuai dengan rencana Anda. Berikut ringkasannya:
 
 <x-mail::panel>
 **Calon tukeran:** {{ $matchedTeacherName }}  
@@ -17,7 +17,7 @@ Kecocokan ditentukan secara dua arah berdasarkan Sudin, kecamatan, jabatan, dan 
 Lihat Calon Tukeran
 </x-mail::button>
 
-Demi menjaga privasi, email ini tidak memuat nomor telepon atau data kontak. Silakan masuk ke aplikasi untuk melihat detail dan menghubungi calon tukeran. Pastikan data profil Anda selalu terbarui, dan ubah status menjadi *Sudah mutasi* apabila proses tukeran telah selesai.
+Demi menjaga privasi, email ini tidak memuat nomor telepon atau data kontak. Silakan masuk ke aplikasi untuk melihat detail dan menghubungi calon tukeran. Pastikan data profil Anda selalu terbarui, dan ubah status menjadi *Sudah tukeran* apabila proses tukeran telah selesai.
 
 <x-mail::unofficial-notice />
 

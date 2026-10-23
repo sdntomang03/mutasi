@@ -1,6 +1,6 @@
 @extends('layouts.exchange')
 
-@section('title', 'Profil Mutasi · Ruang Tukar Guru DKI')
+@section('title', 'Profil Tukeran · Cari Tukeran Guru · DKI Jakarta')
 
 @section('content')
 <div class="page-shell">
@@ -10,8 +10,8 @@
         <section class="dashboard-heading profile-heading">
             <div>
                 <p class="eyebrow">PROFIL GURU</p>
-                <h1>Profil mutasi</h1>
-                <p>Perbarui informasi sekolah asal dan wilayah tujuan mutasimu.</p>
+                <h1>Profil tukeran</h1>
+                <p>Perbarui informasi sekolah asal dan wilayah tujuan tukeranmu.</p>
             </div>
         </section>
         <section class="panel form-panel profile-form-panel">
@@ -23,14 +23,14 @@
             data-is-mutated="{{ auth()->user()->teacherProfile->is_mutated ? '1' : '0' }}"
             data-pending-deletion="{{ $pendingDeletion ? '1' : '0' }}">
             <div>
-                <p class="eyebrow">STATUS MUTASI</p>
-                <h2 id="mutation-status-label">{{ auth()->user()->teacherProfile->is_mutated ? 'Sudah mutasi' : 'Belum mutasi' }}</h2>
+                <p class="eyebrow">STATUS TUKERAN</p>
+                <h2 id="mutation-status-label">{{ auth()->user()->teacherProfile->is_mutated ? 'Sudah tukeran' : 'Belum tukeran' }}</h2>
                 <p class="muted-text">Tandai status ini agar admin dan calon tukeran mengetahui apakah profil masih aktif.</p>
             </div>
             <div class="mutation-status-actions">
-                <select id="mutation-status-select" aria-label="Status mutasi">
-                    <option value="0" @selected(! auth()->user()->teacherProfile->is_mutated)>Belum mutasi</option>
-                    <option value="1" @selected(auth()->user()->teacherProfile->is_mutated)>Sudah mutasi</option>
+                <select id="mutation-status-select" aria-label="Status tukeran">
+                    <option value="0" @selected(! auth()->user()->teacherProfile->is_mutated)>Belum tukeran</option>
+                    <option value="1" @selected(auth()->user()->teacherProfile->is_mutated)>Sudah tukeran</option>
                 </select>
                 <button class="button button-secondary" id="save-mutation-status" type="button">Simpan status</button>
                 <button class="button button-ghost" id="request-profile-deletion" type="button" @disabled(! auth()->user()->teacherProfile->is_mutated || $pendingDeletion)>
@@ -39,10 +39,10 @@
             </div>
         </section>
         @else
-            <p class="notice notice-info">Simpan profil terlebih dahulu sebelum menandai status mutasi atau mengajukan penghapusan.</p>
+            <p class="notice notice-info">Simpan profil terlebih dahulu sebelum menandai status tukeran atau mengajukan penghapusan.</p>
         @endif
     </main>
-    <footer class="footer"><span>Ruang Tukar Guru · DKI Jakarta</span><span>Data profil hanya dibagikan kepada calon yang cocok</span></footer>
+    <footer class="footer"><span>Cari Tukeran Guru · DKI Jakarta</span><span>Data profil hanya dibagikan kepada calon yang cocok</span></footer>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="{{ asset('app.js').'?v='.filemtime(public_path('app.js')) }}" defer></script>

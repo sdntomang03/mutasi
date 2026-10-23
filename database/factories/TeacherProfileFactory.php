@@ -38,7 +38,7 @@ class TeacherProfileFactory extends Factory
             'user_id' => User::factory(),
             'name' => $faker->name(),
             'phone' => fake()->unique()->numerify('+628##########'),
-            'employment_type' => fake()->randomElement(['PNS', 'PPPK', 'KKI']),
+            'employment_type' => 'PNS',
             'position' => 'guru_kelas',
             'level' => 'SD',
             'destination_position' => 'guru_kelas',

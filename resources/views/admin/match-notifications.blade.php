@@ -1,6 +1,6 @@
 @extends('layouts.exchange')
 
-@section('title', 'Email Kecocokan · Ruang Tukar Guru')
+@section('title', 'Email Kecocokan · Cari Tukeran Guru')
 
 @section('content')
 <div class="page-shell admin-shell">
@@ -61,7 +61,7 @@
             <div class="admin-pagination">{{ $pairs->links('vendor.pagination.admin-users') }}</div>
         </section>
     </main>
-    <footer class="footer"><span>Ruang Tukar Guru · Panel administrator</span><span>Pengiriman email dicatat untuk setiap pasangan</span></footer>
+    <footer class="footer"><span>Cari Tukeran Guru · Panel administrator</span><span>Pengiriman email dicatat untuk setiap pasangan</span></footer>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="{{ asset('admin-users.js').'?v='.filemtime(public_path('admin-users.js')) }}" defer></script>

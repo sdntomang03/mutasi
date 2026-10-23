@@ -1,6 +1,6 @@
 @extends('layouts.exchange')
 
-@section('title', 'Dashboard · Ruang Tukar Guru DKI')
+@section('title', 'Dashboard · Cari Tukeran Guru · DKI Jakarta')
 
 @section('content')
 <div class="page-shell">
@@ -9,9 +9,9 @@
     <main class="dashboard-main">
         <section class="dashboard-heading">
             <div>
-                <p class="eyebrow">RUANG TUKAR GURU · DKI JAKARTA</p>
+                <p class="eyebrow">CARI TUKERAN GURU · DKI JAKARTA</p>
                 <h1>Dashboard</h1>
-                <p>Lihat calon tukeran yang cocok dengan rencana mutasimu.</p>
+                <p>Lihat calon guru yang cocok dengan rencana tukeranmu.</p>
             </div>
             @if ($profile)
                 <a class="button button-primary" href="{{ route('teacher-profile.edit') }}">Perbarui profil <span aria-hidden="true">→</span></a>
@@ -23,14 +23,14 @@
         @if (! $profile)
             <section class="empty-state dashboard-empty">
                 <span class="empty-symbol">↔</span>
-                <h2>Lengkapi profil mutasimu</h2>
+                <h2>Lengkapi profil tukeranmu</h2>
                 <p>Setelah profil tersimpan, calon tukeran dengan kecocokan Sudin dua arah akan muncul di sini.</p>
                 <a class="button button-primary" href="{{ route('teacher-profile.edit') }}">Buat profil</a>
             </section>
         @elseif (! $profile->destination_sudin_id || ! $profile->sudin_id || ! $profile->position || ! $profile->level || ($profile->position === 'guru_mapel' && ! $profile->subject_id) || ($profile->destination_position === 'guru_mapel' && $profile->destinationSubjects->isEmpty()) || ! $profile->destination_position || $profile->destinationLevels->isEmpty())
             <section class="empty-state dashboard-empty">
                 <span class="empty-symbol">↔</span>
-                <h2>Lengkapi profil mutasimu</h2>
+                <h2>Lengkapi profil tukeranmu</h2>
                 <p>Tambahkan Sudin, jabatan, dan jenjang asal serta tujuan pada profil untuk mulai menemukan calon tukeran.</p>
                 <a class="button button-primary" href="{{ route('teacher-profile.edit') }}">Perbarui profil</a>
             </section>
@@ -66,7 +66,7 @@
                     <div class="empty-state dashboard-empty">
                         <span class="empty-symbol">⌁</span>
                         <h2>Belum ada kecocokan</h2>
-                        <p>Belum ada guru dengan rencana mutasi yang cocok untuk wilayah ini. Kami akan memberi tahu melalui email saat kecocokan ditemukan.</p>
+                        <p>Belum ada guru dengan rencana tukeran yang cocok untuk wilayah ini. Kami akan memberi tahu melalui email saat kecocokan ditemukan.</p>
                     </div>
                 @else
                     <p class="result-count">{{ $matches->count() }} calon tukeran cocok dengan profilmu</p>
@@ -85,7 +85,7 @@
                                     <p><span>Asal sekolah</span>{{ $candidate->village_name }}, {{ $candidate->district_name }}, {{ $candidate->regency_name }}</p>
                                     <p><span>Alamat sekolah</span>{{ $candidate->school_address }}</p>
                                     <div class="match-destination-fact">
-                                        <span>Tujuan mutasi</span>
+                                        <span>Tujuan tukeran</span>
                                         @if ($candidate->destinationDistricts->isEmpty())
                                             <strong>Semua kecamatan dalam {{ $candidate->destinationSudin->name }}</strong>
                                         @else
@@ -107,6 +107,6 @@
         @endif
     @include('partials.mutation-flow', ['profile' => $profile, 'matchCount' => $matches->count()])
     </main>
-    <footer class="footer"><span>Ruang Tukar Guru · DKI Jakarta</span><span>Kontak calon tukeran hanya tersedia setelah login</span></footer>
+    <footer class="footer"><span>Cari Tukeran Guru · DKI Jakarta</span><span>Kontak calon tukeran hanya tersedia setelah login</span></footer>
 </div>
 @endsection

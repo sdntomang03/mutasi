@@ -1,6 +1,6 @@
 @extends('layouts.exchange')
 
-@section('title', 'Mata Pelajaran · Ruang Tukar Guru')
+@section('title', 'Mata Pelajaran · Cari Tukeran Guru')
 
 @section('content')
 <div class="page-shell admin-shell">

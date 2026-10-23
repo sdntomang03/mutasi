@@ -1,6 +1,6 @@
 @extends('layouts.exchange')
 
-@section('title', 'Ganti Password · Ruang Tukar Guru DKI')
+@section('title', 'Ganti Password · Cari Tukeran Guru · DKI Jakarta')
 
 @section('content')
 <div class="page-shell">

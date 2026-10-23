@@ -33,7 +33,7 @@ class TeacherProfileController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'min:2', 'max:120'],
             'phone' => ['required', 'string', 'min:8', 'max:24', 'regex:/^[+0-9(). -]+$/'],
-            'employment_type' => ['required', 'in:PNS,PPPK,KKI'],
+            'employment_type' => ['required', 'in:PNS'],
             'school_name' => ['required', 'string', 'max:160'],
             'school_address' => ['required', 'string', 'max:1000'],
             'sudin_id' => ['required', 'integer', 'exists:sudins,id'],

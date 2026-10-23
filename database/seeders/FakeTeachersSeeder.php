@@ -77,7 +77,7 @@ class FakeTeachersSeeder extends Seeder
             ->state([
                 'name' => $user->name,
                 'phone' => sprintf('+62812%08d', $number),
-                'employment_type' => fake()->randomElement(['PNS', 'PPPK', 'KKI']),
+                'employment_type' => 'PNS',
                 'position' => 'guru_kelas',
                 'level' => 'SD',
                 'destination_position' => 'guru_kelas',

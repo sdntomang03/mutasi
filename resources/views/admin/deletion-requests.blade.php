@@ -1,6 +1,6 @@
 @extends('layouts.exchange')
 
-@section('title', 'Pengajuan Hapus · Ruang Tukar Guru')
+@section('title', 'Pengajuan Hapus · Cari Tukeran Guru')
 
 @section('content')
 <div class="page-shell admin-shell">
@@ -27,7 +27,7 @@
                             @if ($deletionRequest->profile)
                                 <span><small>Nama profil</small>{{ $deletionRequest->profile->name }}</span>
                                 <span><small>Sekolah</small>{{ $deletionRequest->profile->school_name }}</span>
-                                <span><small>Status mutasi</small>{{ $deletionRequest->profile->is_mutated ? 'Sudah mutasi' : 'Belum mutasi' }}</span>
+                                <span><small>Status tukeran</small>{{ $deletionRequest->profile->is_mutated ? 'Sudah tukeran' : 'Belum tukeran' }}</span>
                             @else
                                 <span>Profil tidak lagi tersedia.</span>
                             @endif
@@ -44,7 +44,7 @@
             <div class="admin-pagination">{{ $deletionRequests->links('vendor.pagination.admin-users') }}</div>
         </section>
     </main>
-    <footer class="footer"><span>Ruang Tukar Guru · Panel administrator</span><span>Soft delete menjaga data tetap tersimpan</span></footer>
+    <footer class="footer"><span>Cari Tukeran Guru · Panel administrator</span><span>Soft delete menjaga data tetap tersimpan</span></footer>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="{{ asset('admin-users.js').'?v='.filemtime(public_path('admin-users.js')) }}" defer></script>

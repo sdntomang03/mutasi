@@ -55,7 +55,7 @@ class TeacherDirectoryTest extends TestCase
 
         $this->actingAs($me)->get('/daftar-guru')
             ->assertOk()
-            ->assertSee('R***n K***s')
+            ->assertSee('R***N K***S')
             ->assertDontSee('Rekan Kelas')
             ->assertDontSee('Rekan Mapel')
             ->assertDontSee('Belum Verifikasi')
@@ -65,7 +65,7 @@ class TeacherDirectoryTest extends TestCase
         $mapel = $this->teacher('Saya Mapel', 'guru_mapel', $a, $b);
         $this->actingAs($mapel)->get('/daftar-guru')
             ->assertOk()
-            ->assertSee('R***n M***l')
+            ->assertSee('R***N M***L')
             ->assertDontSee('Rekan Mapel')
             ->assertDontSee('Rekan Kelas');
     }
@@ -105,7 +105,7 @@ class TeacherDirectoryTest extends TestCase
             ->assertJsonPath('profile.position_label', 'Guru kelas')
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('data.0.id', $classTeacher->teacherProfile->id)
-            ->assertJsonPath('data.0.name', 'R***n K***s')
+            ->assertJsonPath('data.0.name', 'R***N K***S')
             ->assertJsonPath('data.0.position', 'guru_kelas')
             ->assertJsonPath('data.0.position_label', 'Guru kelas');
 
@@ -121,7 +121,7 @@ class TeacherDirectoryTest extends TestCase
             ->assertJsonPath('profile.position', 'guru_mapel')
             ->assertJsonCount(2, 'data')
             ->assertJsonPath('data.0.id', $mapelTeacher->teacherProfile->id)
-            ->assertJsonPath('data.0.name', 'R***n M***l')
+            ->assertJsonPath('data.0.name', 'R***N M***L')
             ->assertJsonPath('data.1.id', $mapelTeacherTwo->teacherProfile->id);
 
         $this->assertStringNotContainsString('phone', $mapel->getContent());
@@ -132,7 +132,7 @@ class TeacherDirectoryTest extends TestCase
     {
         $profile = new TeacherProfile(['name' => 'Martha Gunj']);
 
-        $this->assertSame('M****a G**j', $profile->maskedName());
+        $this->assertSame('M****A G**J', $profile->maskedName());
     }
 
     public function test_api_requires_a_teacher_profile_with_a_position(): void

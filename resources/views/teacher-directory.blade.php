@@ -1,6 +1,6 @@
 @extends('layouts.exchange')
 
-@section('title', 'Daftar Guru · Ruang Tukar Guru DKI')
+@section('title', 'Daftar Guru · Cari Tukeran Guru · DKI Jakarta')
 
 @section('content')
 <div class="page-shell">
@@ -16,7 +16,7 @@
         @if (! $position)
         <section class="panel admin-users-panel">
             <div class="empty-state"><span class="empty-symbol">⌁</span>
-                <p>Lengkapi <a href="{{ route('teacher-profile.edit') }}">profil mutasi</a> terlebih dahulu agar daftar
+                <p>Lengkapi <a href="{{ route('teacher-profile.edit') }}">profil tukeran</a> terlebih dahulu agar daftar
                     guru dengan jabatan yang sama dapat ditampilkan.</p>
             </div>
         </section>
@@ -163,7 +163,7 @@
         </section>
         @endif
     </main>
-    <footer class="footer"><span>Ruang Tukar Guru · Daftar guru</span><span>Nomor kontak hanya tampil pada kecocokan di
+    <footer class="footer"><span>Cari Tukeran Guru · Daftar guru</span><span>Nomor kontak hanya tampil pada kecocokan di
             dashboard</span></footer>
 </div>
 <div class="user-modal" id="user-modal" role="dialog" aria-modal="true" aria-label="Detail guru" hidden>

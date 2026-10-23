@@ -48,7 +48,7 @@ class TeacherProfile extends Model
 
     public function maskedName(): string
     {
-        return preg_replace_callback('/\S+/u', static function (array $matches): string {
+        $maskedName = preg_replace_callback('/\S+/u', static function (array $matches): string {
             $word = $matches[0];
             $length = mb_strlen($word);
 
@@ -60,6 +60,8 @@ class TeacherProfile extends Model
                 .str_repeat('*', $length - 2)
                 .mb_substr($word, -1);
         }, $this->name) ?? $this->name;
+
+        return mb_strtoupper($maskedName);
     }
 
     public function sudin(): BelongsTo

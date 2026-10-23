@@ -16,12 +16,12 @@ class ExampleTest extends TestCase
 
         $this->get('/login')
             ->assertOk()
-            ->assertSee('Masuk · Ruang Tukar Guru · DKI Jakarta', false)
+            ->assertSee('Masuk · Cari Tukeran Guru · DKI Jakarta', false)
             ->assertSee('Daftar');
         $this->get('/register')->assertOk()->assertSee('Ulangi kata sandi');
         $this->get('/forgot-password')
             ->assertOk()
-            ->assertSee('Lupa kata sandi · Ruang Tukar Guru · DKI Jakarta', false)
+            ->assertSee('Lupa kata sandi · Cari Tukeran Guru · DKI Jakarta', false)
             ->assertSee('Lupa kata sandi?');
     }
 }

@@ -290,14 +290,14 @@
     function renderDestinations() {
         const container = $('#selected-destinations');
         if (destinationList.length === 0) {
-            container.innerHTML = '<p class="empty-inline">Tujuan mutasi belum dipilih.</p>';
+            container.innerHTML = '<p class="empty-inline">Tujuan tukeran belum dipilih.</p>';
             return;
         }
         container.innerHTML = destinationList.map((item, index) => `
             <div class="destination-chip">
                 <span class="chip-dot"></span>
                 <span><strong>${escapeHtml(item.sudin_name)}</strong><small>${item.district_codes.length ? `Kecamatan: ${item.district_names.map(escapeHtml).join(', ')}` : 'Semua kecamatan dalam Sudin'}</small></span>
-                <button type="button" class="remove-destination" data-index="${index}" aria-label="Hapus tujuan mutasi">×</button>
+                <button type="button" class="remove-destination" data-index="${index}" aria-label="Hapus tujuan tukeran">×</button>
             </div>`).join('');
     }
 
@@ -435,7 +435,7 @@
                     body: JSON.stringify({ is_mutated: statusSelect.value === '1' }),
                 });
                 profileStatus.dataset.isMutated = result.data.is_mutated ? '1' : '0';
-                $('#mutation-status-label').textContent = result.data.is_mutated ? 'Sudah mutasi' : 'Belum mutasi';
+                $('#mutation-status-label').textContent = result.data.is_mutated ? 'Sudah tukeran' : 'Belum tukeran';
                 deletionButton.disabled = !result.data.is_mutated || profileStatus.dataset.pendingDeletion === '1';
                 showToast(result.message);
             } catch (error) {

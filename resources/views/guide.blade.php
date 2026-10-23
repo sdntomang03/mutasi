@@ -1,6 +1,6 @@
 @extends('layouts.exchange')
 
-@section('title', 'Panduan · Ruang Tukar Guru DKI')
+@section('title', 'Panduan · Cari Tukeran Guru · DKI Jakarta')
 
 @section('content')
 <div class="page-shell">
@@ -9,7 +9,7 @@
         <a class="back-link" href="{{ route('dashboard') }}">← Kembali ke dashboard</a>
         <section class="admin-intro">
             <p class="eyebrow">PANDUAN PENGGUNA</p>
-            <h1>Cara kerja Ruang Tukar Guru</h1>
+            <h1>Cara kerja Cari Tukeran Guru</h1>
             <p>Aplikasi ini mempertemukan guru DKI Jakarta yang ingin bertukar tempat tugas (tukeran). Halaman ini
                 menjelaskan aturan pencocokan, status profil, dan notifikasi.</p>
         </section>
@@ -30,9 +30,9 @@
             <section class="panel guide-card guide-flow-step">
                 <span class="guide-step-marker" aria-hidden="true">02</span>
                 <p class="eyebrow">LANGKAH 2</p>
-                <h2>Isi profil mutasi</h2>
+                <h2>Isi profil tukeran</h2>
                 <ul>
-                    <li><strong>Data diri:</strong> nama, nomor HP, dan jenis kepegawaian (PNS, PPPK, atau KKI).</li>
+                    <li><strong>Data diri:</strong> nama, nomor HP, dan jenis kepegawaian PNS.</li>
                     <li><strong>Jabatan dan jenjang:</strong> pilih jabatan (guru kelas atau guru mapel) dan
                         <em>satu</em> jenjang sekolah asal (SD, SMP, SMA, atau SMK). Guru mapel juga memilih <em>mapel
                             yang diampu</em>.</li>
@@ -40,7 +40,7 @@
                         lalu kota, kecamatan, dan kelurahan).</li>
                     <li><strong>Sudin asal</strong> ditentukan otomatis dari kecamatan sekolah asal, berdasarkan
                         pengaturan admin.</li>
-                    <li><strong>Tujuan mutasi:</strong> pilih Sudin tujuan, lalu pilih <em>semua kecamatan</em> atau
+                    <li><strong>Tujuan tukeran:</strong> pilih Sudin tujuan, lalu pilih <em>semua kecamatan</em> atau
                         <em>beberapa kecamatan</em> di Sudin tersebut.</li>
                     <li><strong>Jabatan dan jenjang tujuan:</strong> guru mapel dapat memilih beberapa jenjang tujuan,
                         guru kelas hanya satu jenjang. Bila tujuanmu guru mapel, pilih satu atau beberapa mapel tujuan
@@ -74,7 +74,7 @@
                 </p>
                 <p>Profil lama yang belum mengisi jabatan dan jenjang harus diperbarui lebih dulu. Profil
                     <strong>tidak</strong> diikutkan dalam pencocokan bila: email belum terverifikasi, status sudah
-                    mutasi, ada pengajuan hapus yang menunggu admin, atau akun sudah dihapus.</p>
+                    tukeran sudah selesai, ada pengajuan hapus yang menunggu admin, atau akun sudah dihapus.</p>
             </section>
 
             <section class="panel guide-card guide-flow-step">
@@ -103,17 +103,17 @@
             <section class="panel guide-card guide-flow-step">
                 <span class="guide-step-marker" aria-hidden="true">06</span>
                 <p class="eyebrow">STATUS PROFIL</p>
-                <h2>Sudah mutasi dan penghapusan profil</h2>
+                <h2>Tukeran selesai dan penghapusan profil</h2>
                 <ol>
                     <li>Di halaman <a href="{{ route('teacher-profile.edit') }}">Profil</a>, ubah status menjadi
-                        <strong>Sudah mutasi</strong> bila kamu sudah mendapat tukeran. Profilmu langsung keluar dari
+                        <strong>Sudah tukeran</strong> bila proses tukar tempat tugasmu sudah selesai. Profilmu langsung keluar dari
                         pencocokan.</li>
-                    <li>Setelah berstatus sudah mutasi, kamu dapat <strong>mengajukan penghapusan profil</strong>.
+                    <li>Setelah berstatus sudah tukeran, kamu dapat <strong>mengajukan penghapusan profil</strong>.
                         Pengajuan ini ditinjau admin.</li>
-                    <li>Selama pengajuan menunggu, status tidak dapat dikembalikan ke belum mutasi.</li>
+                    <li>Selama pengajuan menunggu, status tidak dapat dikembalikan ke belum tukeran.</li>
                     <li>Bila disetujui, akun dinonaktifkan (soft delete): tidak bisa login, tidak muncul di pencocokan,
                         dan tidak tampil di daftar admin.</li>
-                    <li>Jika ingin aktif lagi sebelum pengajuan, ubah status kembali ke <strong>Belum mutasi</strong>
+                    <li>Jika ingin aktif lagi sebelum pengajuan, ubah status kembali ke <strong>Belum tukeran</strong>
                         (hanya bila belum ada pengajuan yang menunggu).</li>
                 </ol>
             </section>
@@ -123,9 +123,9 @@
             <section class="panel guide-card guide-wide">
                 <p class="eyebrow">TENTANG APLIKASI</p>
                 <h2>Aplikasi unofficial</h2>
-                <p>Ruang Tukar Guru dibuat <strong>secara mandiri dan swadaya</strong>. Aplikasi ini <strong>bukan
+                <p>Cari Tukeran Guru dibuat <strong>secara mandiri dan swadaya</strong>. Aplikasi ini <strong>bukan
                         layanan resmi</strong> Dinas Pendidikan, Sudin, maupun instansi pemerintah lainnya. Hasil
-                    pencocokan hanya membantu mempertemukan calon tukeran; proses dan keputusan mutasi tetap mengikuti
+                    pencocokan hanya membantu mempertemukan calon tukeran; proses dan keputusan pindah tempat tugas tetap mengikuti
                     ketentuan resmi yang berlaku.</p>
             </section>
 
@@ -137,6 +137,6 @@
             </section>
         </div>
     </main>
-    <footer class="footer"><span>Ruang Tukar Guru · DKI Jakarta</span><span>Panduan pengguna</span></footer>
+    <footer class="footer"><span>Cari Tukeran Guru · DKI Jakarta</span><span>Panduan pengguna</span></footer>
 </div>
 @endsection

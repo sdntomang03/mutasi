@@ -2,7 +2,7 @@
     <div class="auth-heading">
         <p class="eyebrow">SATU LANGKAH LAGI</p>
         <h2>Verifikasi emailmu</h2>
-        <p>Terima kasih sudah mendaftar. Klik tautan verifikasi yang kami kirim melalui email untuk mulai menggunakan Ruang Tukar Guru.</p>
+        <p>Terima kasih sudah mendaftar. Klik tautan verifikasi yang kami kirim melalui email untuk mulai menggunakan Cari Tukeran Guru.</p>
     </div>
     @if (session('status') == 'verification-link-sent')
         <div class="notice notice-info auth-status"><span class="notice-icon" aria-hidden="true">i</span><p>Tautan verifikasi baru sudah dikirim ke alamat email yang kamu daftarkan.</p></div>

@@ -15,7 +15,7 @@
 <header class="topbar app-topbar">
     <a class="brand" href="{{ $isAdmin ? route('admin.users') : route('dashboard') }}">
         <span class="brand-mark">@include('partials.brand-icon')</span>
-        <span>Ruang Tukar Guru <small>DKI Jakarta</small></span>
+        <span>Cari Tukeran Guru <small>DKI Jakarta</small></span>
     </a>
     <nav class="app-navigation" aria-label="Navigasi utama">
         @foreach ($links as [$routeName, $label])

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -208,11 +209,11 @@ class TeacherExchangeTest extends TestCase
             $mail->assertSeeInText('menjadi tanggung jawab Anda');
 
             return $mail->teacherName === 'Guru A'
-                && $mail->matchedTeacherName === 'G**u *'
+                && $mail->matchedTeacherName === 'G**U *'
                 && $mail->hasTo('guru-a@example.test');
         });
         Mail::assertSent(ReciprocalMatchFound::class, fn (ReciprocalMatchFound $mail) => $mail->teacherName === 'Guru B'
-            && $mail->matchedTeacherName === 'G**u *'
+            && $mail->matchedTeacherName === 'G**U *'
             && $mail->hasTo('guru-b@example.test'));
 
         $payload = $this->profilePayload($sudinB, $originB, $originA, 'Guru B', '081234567802');
@@ -273,14 +274,44 @@ class TeacherExchangeTest extends TestCase
         $this->actingAs($userA)->get('/dashboard')
             ->assertOk()
             ->assertSee('Calon tukeran')
-            ->assertSee('G**u *')
+            ->assertSee('G**U *')
             ->assertDontSee('Guru B')
             ->assertSee('+6281234567802');
         $this->actingAs($userA)->get('/teacher-profile')
             ->assertOk()
-            ->assertSee('Profil mutasi')
+            ->assertSee('Cari Tukeran Guru')
+            ->assertSee('Profil tukeran')
             ->assertSee('profile-form')
+            ->assertSee('value="PNS"', false)
+            ->assertDontSee('PPPK')
+            ->assertDontSee('KKI')
             ->assertSee('district-checks');
+    }
+
+    public static function unsupportedEmploymentTypes(): array
+    {
+        return [
+            'PPPK' => ['PPPK'],
+            'KKI' => ['KKI'],
+        ];
+    }
+
+    #[DataProvider('unsupportedEmploymentTypes')]
+    public function test_profile_api_returns_422_for_non_pns_employment_types(string $employmentType): void
+    {
+        $origin = $this->district('31.71.01', 'Kecamatan A', '31.71', 'Kota Administrasi Jakarta Pusat');
+        $destination = $this->district('31.72.01', 'Kecamatan B', '31.72', 'Kota Administrasi Jakarta Utara');
+        $sudin = $this->sudinFor($origin, 'Jakarta Pusat 1');
+        $this->sudinFor($destination, 'Jakarta Utara 1');
+        $user = $this->teacherUser('employment-type@example.test');
+        $payload = $this->profilePayload($sudin, $origin, $destination);
+        $payload['employment_type'] = $employmentType;
+
+        $this->actingAs($user)->postJson('/api/profile', $payload)
+            ->assertUnprocessable()
+            ->assertJsonPath('errors.employment_type.0', 'The selected employment type is invalid.');
+
+        $this->assertDatabaseMissing('teacher_profiles', ['user_id' => $user->id]);
     }
 
     public function test_teacher_can_mark_mutated_and_request_admin_approved_profile_deletion(): void
@@ -536,7 +567,7 @@ class TeacherExchangeTest extends TestCase
 
         $this->actingAs($userA)->getJson('/api/matches')
             ->assertOk()
-            ->assertJsonPath('data.0.name', 'G**u *')
+            ->assertJsonPath('data.0.name', 'G**U *')
             ->assertJsonPath('data.0.phone', '+6281234567802');
 
         $this->actingAs($userA)->getJson('/api/sudins/'.$sudinB->id.'/districts')
@@ -547,12 +578,12 @@ class TeacherExchangeTest extends TestCase
         $this->actingAs($userA)->getJson('/api/matches?candidate_origin_district_code='.$originB->code)
             ->assertOk()
             ->assertJsonCount(2, 'data')
-            ->assertJsonPath('data.0.name', 'G**u *');
+            ->assertJsonPath('data.0.name', 'G**U *');
 
         $this->actingAs($userA)->getJson('/api/matches?candidate_origin_district_code='.$otherDistrictInSudinB->code)
             ->assertOk()
             ->assertJsonCount(1, 'data')
-            ->assertJsonPath('data.0.name', 'G**u *');
+            ->assertJsonPath('data.0.name', 'G**U *');
         $this->actingAs($userA)->getJson('/api/matches')
             ->assertOk()
             ->assertJsonMissing(['name' => 'Guru E']);
@@ -730,7 +761,7 @@ class TeacherExchangeTest extends TestCase
             return collect($this->actingAs($userA)->getJson('/api/matches')->json('data'))->pluck('name')->all();
         };
 
-        $this->assertSame(['G**u *'], $matchNames(['position' => 'guru_mapel', 'level' => 'SMA', 'destination_position' => 'guru_mapel', 'destination_levels' => ['SMP', 'SD']]));
+        $this->assertSame(['G**U *'], $matchNames(['position' => 'guru_mapel', 'level' => 'SMA', 'destination_position' => 'guru_mapel', 'destination_levels' => ['SMP', 'SD']]));
         $this->assertSame([], $matchNames(['position' => 'guru_kelas', 'level' => 'SMA', 'destination_position' => 'guru_mapel', 'destination_levels' => ['SMP']]));
         $this->assertSame([], $matchNames(['position' => 'guru_mapel', 'level' => 'SD', 'destination_position' => 'guru_mapel', 'destination_levels' => ['SMP']]));
         $this->assertSame([], $matchNames(['position' => 'guru_mapel', 'level' => 'SMA', 'destination_position' => 'guru_mapel', 'destination_levels' => ['SD']]));

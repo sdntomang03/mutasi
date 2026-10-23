@@ -5,7 +5,7 @@
         <label class="field"><span>Nomor HP / WhatsApp</span><input name="phone" type="tel" required maxlength="24" autocomplete="tel" placeholder="08xxxxxxxxxx"></label>
         <label class="field"><span>Status kepegawaian</span>
             <select name="employment_type" required>
-                <option value="">Pilih status</option><option value="PNS">PNS</option><option value="PPPK">PPPK</option><option value="KKI">KKI</option>
+                <option value="">Pilih status</option><option value="PNS">PNS</option>
             </select>
         </label>
         <label class="field"><span>Jabatan saat ini</span>
@@ -46,7 +46,7 @@
     </div>
 
     <div class="section-divider"></div>
-    <div class="section-title destination-title"><div><p class="eyebrow">TUJUAN MUTASI</p><h3>Ke mana kamu ingin pindah?</h3><p class="field-help">Pilih Sudin tujuan untuk memuat kecamatan sesuai cakupan yang tersimpan di database. Kamu bisa memilih semua kecamatan atau beberapa kecamatan tertentu.</p></div></div>
+    <div class="section-title destination-title"><div><p class="eyebrow">TUJUAN TUKERAN</p><h3>Di mana kamu ingin bertukar tempat tugas?</h3><p class="field-help">Pilih Sudin tujuan untuk memuat kecamatan sesuai cakupan yang tersimpan di database. Kamu bisa memilih semua kecamatan atau beberapa kecamatan tertentu.</p></div></div>
     <div class="field-grid destination-role-grid">
         <label class="field"><span>Jabatan yang dituju</span>
             <select name="destination_position" id="target-position" required>
@@ -81,9 +81,9 @@
             <label class="field"><span>Cakupan tujuan</span><select id="target-scope" disabled><option value="all">Semua kecamatan dalam Sudin</option><option value="districts">Pilih beberapa kecamatan</option></select></label>
             <fieldset class="field level-field field-wide" id="target-district-wrap" hidden><span>Kecamatan tujuan</span><div class="level-options district-checks" id="target-district"></div><small class="field-help">Centang satu atau beberapa kecamatan tujuan.</small></fieldset>
         </div>
-        <button class="button button-secondary add-destination" id="add-destination" type="button"><span>＋</span> Terapkan tujuan mutasi</button>
+        <button class="button button-secondary add-destination" id="add-destination" type="button"><span>＋</span> Terapkan tujuan tukeran</button>
     </div>
-    <div class="selected-destinations" id="selected-destinations"><p class="empty-inline">Tujuan mutasi belum dipilih.</p></div>
+    <div class="selected-destinations" id="selected-destinations"><p class="empty-inline">Tujuan tukeran belum dipilih.</p></div>
     <button class="button button-primary submit-profile" type="submit"><span>Simpan profil</span><span aria-hidden="true">→</span></button>
     <p class="form-note">Jika ada kecocokan baru, notifikasi email dikirim kepada kedua guru. Detail kontak hanya tampil setelah login.</p>
 </form>

@@ -61,7 +61,7 @@ class TargetedExchangeTeachersSeeder extends Seeder
             [
                 'name' => $name,
                 'phone' => $phone,
-                'employment_type' => fake()->randomElement(['PNS', 'PPPK', 'KKI']),
+                'employment_type' => 'PNS',
                 'position' => 'guru_kelas',
                 'level' => 'SD',
                 'destination_position' => 'guru_kelas',

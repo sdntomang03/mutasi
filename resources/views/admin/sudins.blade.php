@@ -1,6 +1,6 @@
 @extends('layouts.exchange')
 
-@section('title', 'Pengaturan Sudin · Ruang Tukar Guru')
+@section('title', 'Pengaturan Sudin · Cari Tukeran Guru')
 
 @section('content')
 <div class="page-shell admin-shell">
@@ -26,7 +26,7 @@
             </aside>
         </div>
     </main>
-    <footer class="footer"><span>Ruang Tukar Guru · Panel administrator</span><span>Gunakan data wilayah DKI Jakarta yang terbaru</span></footer>
+    <footer class="footer"><span>Cari Tukeran Guru · Panel administrator</span><span>Gunakan data wilayah DKI Jakarta yang terbaru</span></footer>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="{{ asset('admin.js').'?v='.filemtime(public_path('admin.js')) }}" defer></script>

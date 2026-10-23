@@ -1,6 +1,6 @@
 @extends('layouts.exchange')
 
-@section('title', 'Daftar User · Ruang Tukar Guru')
+@section('title', 'Daftar User · Cari Tukeran Guru')
 
 @section('content')
 <div class="page-shell admin-shell">
@@ -48,7 +48,7 @@
                                 $destLevels = $profile?->destinationLevels->pluck('level')->join(', ');
                                 $destSubjects = $profile?->destination_position === 'guru_mapel' ? $profile->destinationSubjects->pluck('name')->join(', ') : '';
                                 $destDistricts = $profile?->destinationDistricts->pluck('name')->join(', ');
-                                $statusText = ! $user->hasVerifiedEmail() ? 'Email belum terverifikasi' : ($profile ? ($profile->is_mutated ? 'Sudah mutasi' : 'Aktif') : 'Profil belum dibuat');
+                                $statusText = ! $user->hasVerifiedEmail() ? 'Email belum terverifikasi' : ($profile ? ($profile->is_mutated ? 'Sudah tukeran' : 'Aktif') : 'Profil belum dibuat');
                             @endphp
                             <tr data-user-row data-position="{{ $profile?->position ?? '' }}">
                                 <td data-order="{{ strtolower($profile?->name ?? $user->name) }}">
@@ -73,7 +73,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <span class="email-verification-status {{ $statusText === 'Aktif' || $statusText === 'Sudah mutasi' ? 'is-verified' : 'is-unverified' }}">{{ $statusText }}</span>
+                                    <span class="email-verification-status {{ $statusText === 'Aktif' || $statusText === 'Sudah tukeran' ? 'is-verified' : 'is-unverified' }}">{{ $statusText }}</span>
                                 </td>
                                 <td>
                                     <button class="button button-secondary dt-detail-button" type="button" data-open-user="user-modal-{{ $user->id }}">Detail</button>
@@ -112,10 +112,10 @@
                                                     <span><small>Sudin tujuan</small>{{ $profile->destinationSudin?->abbreviation ? $profile->destinationSudin->abbreviation.' · ' : '' }}{{ $profile->destinationSudin?->name ?? 'Belum dipilih' }}</span>
                                                     <span><small>Jabatan · jenjang tujuan</small>{{ $destPosition ? $destPosition.' · '.$destLevels.($destSubjects ? ' · '.$destSubjects : '') : 'Belum diisi' }}</span>
                                                     <span><small>Kecamatan tujuan</small>{{ $destDistricts ?: 'Semua kecamatan di Sudin tujuan' }}</span>
-                                                    <label class="field"><span>Status mutasi</span>
+                                                    <label class="field"><span>Status tukeran</span>
                                                         <select data-admin-mutation-status>
-                                                            <option value="0" @selected(! $profile->is_mutated)>Belum mutasi</option>
-                                                            <option value="1" @selected($profile->is_mutated)>Sudah mutasi</option>
+                                                            <option value="0" @selected(! $profile->is_mutated)>Belum tukeran</option>
+                                                            <option value="1" @selected($profile->is_mutated)>Sudah tukeran</option>
                                                         </select>
                                                     </label>
                                                     <button class="button button-secondary" type="button" data-save-admin-status="{{ route('api.admin.teachers.status', $profile) }}">Simpan status</button>
@@ -135,7 +135,7 @@
                 <div class="admin-pagination-links" id="dt-pages"></div>
             </div>
         </section>    </main>
-    <footer class="footer"><span>Ruang Tukar Guru · Panel administrator</span><span>Pengajuan penghapusan ada di menu terpisah</span></footer>
+    <footer class="footer"><span>Cari Tukeran Guru · Panel administrator</span><span>Pengajuan penghapusan ada di menu terpisah</span></footer>
 </div>
 <div class="user-modal" id="user-modal" role="dialog" aria-modal="true" aria-label="Detail user" hidden><div class="user-modal-box"><button type="button" class="user-modal-close" id="user-modal-close" aria-label="Tutup">×</button><div id="user-modal-body"></div></div></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>

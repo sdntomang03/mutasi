@@ -12,7 +12,7 @@
         request()->routeIs('password.confirm') => 'Konfirmasi kata sandi',
         request()->routeIs('verification.notice') => 'Verifikasi email',
         default => 'Akun',
-    } }} · Ruang Tukar Guru · DKI Jakarta</title>
+    } }} · Cari Tukeran Guru · DKI Jakarta</title>
     <link rel="stylesheet" href="{{ asset('app.css').'?v='.filemtime(public_path('app.css')) }}">
 </head>
 <body class="auth-body">
@@ -20,24 +20,24 @@
         <aside class="auth-aside">
             <a class="brand auth-brand" href="{{ route('welcome') }}">
                 <span class="brand-mark">@include('partials.brand-icon')</span>
-                <span>Ruang Tukar Guru <small>DKI Jakarta</small></span>
+                <span>Cari Tukeran Guru <small>DKI Jakarta</small></span>
             </a>
             <div class="auth-aside-content">
                 <p class="eyebrow">RUANG KOLABORASI GURU</p>
-                <h1>Temukan jalan<br>mutasi <em>bersama.</em></h1>
-                <p>Hubungkan rencana mutasimu dengan guru lain melalui kecocokan Sudin asal dan tujuan di DKI Jakarta.</p>
+                <h1>Temukan teman<br>tukeran <em>bersama.</em></h1>
+                <p>Temukan guru lain untuk bertukar tempat tugas melalui kecocokan Sudin asal dan tujuan di DKI Jakarta.</p>
                 <div class="auth-aside-note">
                     <span aria-hidden="true">↔</span>
                     <span>Lebih mudah menemukan calon tukeran yang tepat.</span>
                 </div>
             </div>
-            <span class="auth-aside-footer">Ruang Tukar Guru · DKI Jakarta</span>
+            <span class="auth-aside-footer">Cari Tukeran Guru · DKI Jakarta</span>
         </aside>
         <section class="auth-main">
             <div class="auth-mobile-brand">
                 <a class="brand" href="{{ route('welcome') }}">
                     <span class="brand-mark">@include('partials.brand-icon')</span>
-                    <span>Ruang Tukar Guru <small>DKI Jakarta</small></span>
+                    <span>Cari Tukeran Guru <small>DKI Jakarta</small></span>
                 </a>
             </div>
             <div class="auth-card">

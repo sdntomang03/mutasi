@@ -1,6 +1,6 @@
 # Dokumentasi API
 
-API ini menyediakan data dan operasi untuk aplikasi Ruang Tukar Guru DKI Jakarta. Semua endpoint memakai prefix `/api` dan mengembalikan JSON. Klien eksternal menggunakan personal access token Laravel Sanctum, sementara aplikasi web same-origin tetap dapat memakai sesi dan perlindungan CSRF melalui middleware stateful Sanctum. Body permintaan umumnya JSON, kecuali unggahan CSV.
+API ini menyediakan data dan operasi untuk aplikasi Cari Tukeran Guru DKI Jakarta. Semua endpoint memakai prefix `/api` dan mengembalikan JSON. Klien eksternal menggunakan personal access token Laravel Sanctum, sementara aplikasi web same-origin tetap dapat memakai sesi dan perlindungan CSRF melalui middleware stateful Sanctum. Body permintaan umumnya JSON, kecuali unggahan CSV.
 
 ## Autentikasi dan format
 
@@ -60,7 +60,7 @@ Gunakan `GET /api/sudins/{sudin}/districts` untuk daftar kecamatan Sudin. Untuk 
 | --- | --- |
 | `name` | string, 2–120 karakter |
 | `phone` | string, 8–24 karakter; hanya angka, spasi, `+`, `()`, titik, dan tanda hubung |
-| `employment_type` | `PNS`, `PPPK`, atau `KKI` |
+| `employment_type` | hanya `PNS` |
 | `school_name` | string, maksimal 160 karakter |
 | `school_address` | string, maksimal 1000 karakter |
 | `sudin_id` | ID Sudin asal |
@@ -103,7 +103,7 @@ Kode wilayah harus sesuai hierarki DKI Jakarta, kecamatan asal harus berada dala
 }
 ```
 
-Profil baru mengembalikan `201 Created`; pembaruan mengembalikan `200 OK`. Data profil menyertakan relasi Sudin, kecamatan tujuan, jenjang, dan mapel terkait.
+Profil baru mengembalikan `201 Created`; pembaruan mengembalikan `200 OK`. `employment_type` selain `PNS` ditolak dengan `422`. Data profil menyertakan relasi Sudin, kecamatan tujuan, jenjang, dan mapel terkait.
 
 ### Mencari kecocokan
 
@@ -111,7 +111,7 @@ Profil baru mengembalikan `201 Created`; pembaruan mengembalikan `200 OK`. Data 
 
 ### Daftar guru dengan jabatan yang sama
 
-`GET /api/teachers` mengembalikan guru lain yang `position`-nya sama dengan jabatan saat ini pada profil pemanggil (`guru_kelas` atau `guru_mapel`). Hasil mengecualikan profil sendiri, guru yang sudah mutasi, dan akun yang emailnya belum terverifikasi. Endpoint ini berbeda dari `/api/matches`: daftar ini tidak mensyaratkan kecocokan dua arah. Nama guru lain disamarkan dengan mempertahankan huruf pertama dan terakhir setiap bagian nama (contoh `M****a G**j`). Nomor telepon, email, dan alamat sekolah tidak disertakan; profil dan jabatan harus sudah dilengkapi.
+`GET /api/teachers` mengembalikan guru lain yang `position`-nya sama dengan jabatan saat ini pada profil pemanggil (`guru_kelas` atau `guru_mapel`). Hasil mengecualikan profil sendiri, guru yang sudah menandai tukerannya selesai, dan akun yang emailnya belum terverifikasi. Endpoint ini berbeda dari `/api/matches`: daftar ini tidak mensyaratkan kecocokan dua arah. Nama guru lain disamarkan dengan mempertahankan huruf pertama dan terakhir setiap bagian nama, lalu ditampilkan dengan huruf kapital (contoh `M****A G**J`). Nomor telepon, email, dan alamat sekolah tidak disertakan; profil dan jabatan harus sudah dilengkapi.
 
 ### Status dan pengajuan penghapusan
 
@@ -119,7 +119,7 @@ Profil baru mengembalikan `201 Created`; pembaruan mengembalikan `200 OK`. Data 
 { "is_mutated": true }
 ```
 
-Kirim body tersebut ke `PATCH /api/teacher-profile/status`. Nilai harus boolean. Profil hanya dapat mengajukan penghapusan setelah ditandai sudah mutasi:
+Kirim body tersebut ke `PATCH /api/teacher-profile/status`. Nilai harus boolean; field `is_mutated` tetap dipertahankan demi kompatibilitas API, dan `true` berarti status tukeran selesai. Profil hanya dapat mengajukan penghapusan setelah status tersebut aktif:
 
 ```http
 POST /api/teacher-profile/deletion-request
