@@ -4,7 +4,7 @@ API ini menyediakan data dan operasi untuk aplikasi Ruang Tukar Guru DKI Jakarta
 
 ## Autentikasi dan format
 
-- Kirim `POST /api/login` dengan `email`, `password`, dan `device_name`. Respons memberikan token Bearer yang hanya ditampilkan sekali.
+- Kirim `POST /api/login` dengan `email` dan `password`. `device_name` opsional dan hanya menjadi label token; jika tidak dikirim, label `api-client` digunakan. Respons memberikan token Sanctum yang hanya ditampilkan sekali.
 - Sertakan `Authorization: Bearer <token>` dan `Accept: application/json` pada setiap endpoint terproteksi.
 - Token berlaku selama 30 hari. Kirim `DELETE /api/logout` dengan token tersebut untuk mencabut token yang sedang dipakai.
 - Token guru hanya memiliki ability `guru`; token admin hanya memiliki ability `admin`. Setiap route memeriksa ability token dan role akun, dan endpoint guru juga memerlukan email terverifikasi.
@@ -18,8 +18,7 @@ Content-Type: application/json
 
 {
   "email": "guru@example.test",
-  "password": "password",
-  "device_name": "Aplikasi Android"
+  "password": "password"
 }
 ```
 

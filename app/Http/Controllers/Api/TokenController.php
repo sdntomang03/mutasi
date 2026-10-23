@@ -18,7 +18,7 @@ class TokenController extends Controller
         $data = $request->validate([
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
-            'device_name' => ['required', 'string', 'max:100'],
+            'device_name' => ['sometimes', 'required', 'string', 'max:100'],
         ]);
 
         $throttleKey = Str::transliterate(Str::lower($data['email']).'|'.$request->ip());
@@ -48,7 +48,7 @@ class TokenController extends Controller
         }
 
         RateLimiter::clear($throttleKey);
-        $token = $user->createToken($data['device_name'], $abilities, now()->addDays(30));
+        $token = $user->createToken($data['device_name'] ?? 'api-client', $abilities, now()->addDays(30));
 
         return response()->json([
             'data' => [

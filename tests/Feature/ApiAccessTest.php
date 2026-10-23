@@ -46,6 +46,22 @@ class ApiAccessTest extends TestCase
             ->assertJsonPath('data', []);
     }
 
+    public function test_login_does_not_require_a_device_name(): void
+    {
+        $teacher = User::factory()->create();
+        $teacher->assignRole(Role::findOrCreate('guru', 'web'));
+
+        $this->postJson('/api/login', [
+            'email' => $teacher->email,
+            'password' => 'password',
+        ])->assertOk();
+
+        $this->assertDatabaseHas('personal_access_tokens', [
+            'tokenable_id' => $teacher->id,
+            'name' => 'api-client',
+        ]);
+    }
+
     public function test_teacher_cannot_access_admin_api(): void
     {
         $teacher = User::factory()->create();
