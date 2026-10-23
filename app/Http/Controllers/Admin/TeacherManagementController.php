@@ -131,7 +131,7 @@ class TeacherManagementController extends Controller
 
         return response()->json([
             'data' => ['is_mutated' => $teacherProfile->is_mutated],
-            'message' => 'Status mutasi profil berhasil diperbarui.',
+            'message' => 'Status tukeran profil berhasil diperbarui.',
         ]);
     }
 
@@ -147,7 +147,7 @@ class TeacherManagementController extends Controller
 
             $profile = $lockedRequest->profile;
             if (! $profile || ! $profile->is_mutated) {
-                abort(409, 'Profil tidak lagi tersedia atau belum ditandai sudah mutasi.');
+                abort(409, 'Profil tidak lagi tersedia atau belum ditandai tukerannya selesai.');
             }
 
             $lockedRequest->reviewed_by = $request->user()->id;

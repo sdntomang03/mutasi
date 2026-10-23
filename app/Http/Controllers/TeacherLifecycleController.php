@@ -17,7 +17,7 @@ class TeacherLifecycleController extends Controller
         if ($profile->is_mutated && ! $data['is_mutated']
             && $profile->deletionRequests()->where('status', 'pending')->exists()) {
             return response()->json([
-                'message' => 'Admin sedang memproses pengajuan penghapusan. Hubungi admin untuk membatalkan pengajuan sebelum mengubah status mutasi.',
+                'message' => 'Admin sedang memproses pengajuan penghapusan. Hubungi admin untuk membatalkan pengajuan sebelum mengubah status tukeran.',
             ], 409);
         }
 
@@ -27,8 +27,8 @@ class TeacherLifecycleController extends Controller
         return response()->json([
             'data' => ['is_mutated' => $profile->is_mutated],
             'message' => $profile->is_mutated
-                ? 'Status diperbarui menjadi sudah mutasi.'
-                : 'Status diperbarui menjadi belum mutasi.',
+                ? 'Status diperbarui menjadi tukeran selesai.'
+                : 'Status diperbarui menjadi belum tukeran.',
         ]);
     }
 
@@ -38,13 +38,13 @@ class TeacherLifecycleController extends Controller
         $profile = $user->teacherProfile()->firstOrFail();
 
         if (! $profile->is_mutated) {
-            return response()->json(['message' => 'Profil hanya dapat diajukan untuk dihapus setelah ditandai sudah mutasi.'], 422);
+            return response()->json(['message' => 'Profil hanya dapat diajukan untuk dihapus setelah tukeran selesai.'], 422);
         }
 
         $deletionRequest = DB::transaction(function () use ($profile, $user): ProfileDeletionRequest {
             $lockedProfile = $user->teacherProfile()->lockForUpdate()->firstOrFail();
             if (! $lockedProfile->is_mutated) {
-                abort(422, 'Profil hanya dapat diajukan untuk dihapus setelah ditandai sudah mutasi.');
+                abort(422, 'Profil hanya dapat diajukan untuk dihapus setelah tukeran selesai.');
             }
             $pendingRequest = $lockedProfile->deletionRequests()->where('status', 'pending')->first();
             if ($pendingRequest) {

@@ -328,7 +328,7 @@ class TeacherExchangeTest extends TestCase
 
         $this->actingAs($user)->postJson('/api/teacher-profile/deletion-request')
             ->assertUnprocessable()
-            ->assertJsonPath('message', 'Profil hanya dapat diajukan untuk dihapus setelah ditandai sudah mutasi.');
+            ->assertJsonPath('message', 'Profil hanya dapat diajukan untuk dihapus setelah tukeran selesai.');
         $this->actingAs($user)->patchJson('/api/teacher-profile/status', ['is_mutated' => true])
             ->assertOk()
             ->assertJsonPath('data.is_mutated', true);
