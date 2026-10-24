@@ -40,44 +40,48 @@ class SubjectMatchingTest extends TestCase
         $this->sudinB->districts()->attach($this->districtB->code);
     }
 
-    public function test_subject_teachers_match_only_when_subjects_are_reciprocal(): void
+    public function test_subject_teachers_match_only_when_their_current_subjects_are_the_same(): void
     {
         [$math, $english, $science] = $this->subjects(['Matematika Uji', 'Inggris Uji', 'IPA Uji']);
         $userA = $this->teacher();
-        $this->saveProfile($userA, 'a', $this->districtA, $this->districtB, $math, [$english, $science])->assertCreated();
+        $this->saveProfile($userA, 'a', $this->districtA, $this->districtB, $math)->assertCreated();
         $userB = $this->teacher();
 
-        $this->saveProfile($userB, 'b', $this->districtB, $this->districtA, $english, [$math])->assertCreated();
-        $this->assertSame(['Guru b'], $this->matchNames($userA));
-
-        $this->saveProfile($userB, 'b', $this->districtB, $this->districtA, $english, [$science])->assertOk();
+        $this->saveProfile($userB, 'b', $this->districtB, $this->districtA, $english)->assertCreated();
         $this->assertSame([], $this->matchNames($userA));
 
-        $this->saveProfile($userB, 'b', $this->districtB, $this->districtA, $science, [$english])->assertOk();
+        $this->saveProfile($userB, 'b', $this->districtB, $this->districtA, $math)->assertOk();
+        $this->assertSame(['G**U *'], $this->matchNames($userA));
+
+        $this->saveProfile($userB, 'b', $this->districtB, $this->districtA, $science)->assertOk();
         $this->assertSame([], $this->matchNames($userA));
     }
 
-    public function test_class_teachers_do_not_use_subjects_and_may_match_a_subject_teacher_only_in_one_direction(): void
+    public function test_class_teachers_match_without_subjects(): void
     {
-        [$math] = $this->subjects(['Matematika Uji']);
         $classA = $this->teacher();
         $classB = $this->teacher();
-        $this->saveProfile($classA, 'a', $this->districtA, $this->districtB, null, [], 'guru_kelas', 'guru_kelas')->assertCreated();
-        $this->saveProfile($classB, 'b', $this->districtB, $this->districtA, $math, [$math], 'guru_kelas', 'guru_kelas')->assertCreated();
+        $this->saveProfile($classA, 'a', $this->districtA, $this->districtB, null, 'guru_kelas')->assertCreated();
+        $this->saveProfile($classB, 'b', $this->districtB, $this->districtA, null, 'guru_kelas')->assertCreated();
 
         $this->assertDatabaseHas('teacher_profiles', ['name' => 'Guru b', 'subject_id' => null]);
         $this->assertDatabaseCount('teacher_destination_subjects', 0);
-        $this->assertSame(['Guru b'], $this->matchNames($classA));
+        $this->assertSame(['G**U *'], $this->matchNames($classA));
     }
 
-    public function test_subject_teacher_must_choose_origin_and_destination_subjects(): void
+    public function test_subject_teacher_must_choose_an_origin_subject_and_destination_is_derived(): void
     {
         [$math] = $this->subjects(['Matematika Uji']);
         $user = $this->teacher();
 
-        $this->saveProfile($user, 'a', $this->districtA, $this->districtB, null, [$math])->assertUnprocessable();
-        $this->saveProfile($user, 'a', $this->districtA, $this->districtB, $math, [])->assertUnprocessable();
+        $this->saveProfile($user, 'a', $this->districtA, $this->districtB, null)->assertUnprocessable();
         $this->assertDatabaseCount('teacher_profiles', 0);
+
+        $this->saveProfile($user, 'a', $this->districtA, $this->districtB, $math)
+            ->assertCreated()
+            ->assertJsonPath('data.destination_position', 'guru_mapel')
+            ->assertJsonPath('data.destination_levels.0.level', 'SMP')
+            ->assertJsonPath('data.destination_subjects.0.id', $math->id);
     }
 
     public function test_admin_manages_subjects_and_used_subjects_cannot_be_deleted(): void
@@ -91,7 +95,7 @@ class SubjectMatchingTest extends TestCase
         $this->putJson("/api/admin/subjects/{$id}", ['name' => 'Prakarya Baru'])->assertOk();
         $this->assertDatabaseHas('subjects', ['id' => $id, 'name' => 'Prakarya Baru']);
 
-        $this->saveProfile($this->teacher(), 'a', $this->districtA, $this->districtB, Subject::find($id), [Subject::find($id)])->assertCreated();
+        $this->saveProfile($this->teacher(), 'a', $this->districtA, $this->districtB, Subject::find($id))->assertCreated();
         $this->actingAs($admin)->deleteJson("/api/admin/subjects/{$id}")->assertStatus(409);
 
         $unused = Subject::factory()->create();
@@ -138,10 +142,7 @@ class SubjectMatchingTest extends TestCase
         return District::query()->create(['code' => $code, 'name' => 'Kec '.$code, 'regency_code' => $regency, 'regency_name' => 'Kota '.$regency]);
     }
 
-    /**
-     * @param  array<int, Subject>  $destinationSubjects
-     */
-    private function saveProfile(User $user, string $key, District $origin, District $destination, ?Subject $subject, array $destinationSubjects, string $position = 'guru_mapel', string $destinationPosition = 'guru_mapel'): TestResponse
+    private function saveProfile(User $user, string $key, District $origin, District $destination, ?Subject $subject, string $position = 'guru_mapel'): TestResponse
     {
         $sudin = $origin->is($this->districtA) ? $this->sudinA : $this->sudinB;
         $destinationSudin = $destination->is($this->districtA) ? $this->sudinA : $this->sudinB;
@@ -153,9 +154,6 @@ class SubjectMatchingTest extends TestCase
             'position' => $position,
             'level' => $position === 'guru_kelas' ? 'SD' : 'SMP',
             'subject_id' => $subject?->id,
-            'destination_position' => $destinationPosition,
-            'destination_levels' => $destinationPosition === 'guru_kelas' ? ['SD'] : ['SMP'],
-            'destination_subject_ids' => array_map(fn (Subject $item) => $item->id, $destinationSubjects),
             'school_name' => 'SMPN Uji',
             'school_address' => 'Jl. Uji 1',
             'sudin_id' => $sudin->id,

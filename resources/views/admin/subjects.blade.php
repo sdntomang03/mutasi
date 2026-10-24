@@ -9,7 +9,7 @@
         <section class="admin-intro">
             <p class="eyebrow">DATA MASTER</p>
             <h1>Mata pelajaran</h1>
-            <p>Daftar mapel yang dapat dipilih guru mapel sebagai mapel yang diampu dan mapel tujuan. Mapel yang sudah dipakai profil guru tidak dapat dihapus.</p>
+            <p>Daftar mapel yang dapat dipilih guru mapel sebagai mapel yang diampu. Mapel tujuan otomatis mengikuti pilihan ini. Mapel yang sudah dipakai profil guru tidak dapat dihapus.</p>
         </section>
 
         <div class="subject-layout">

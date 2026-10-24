@@ -39,16 +39,7 @@ class TeacherProfileController extends Controller
             'sudin_id' => ['required', 'integer', 'exists:sudins,id'],
             'position' => ['required', Rule::in(array_keys(TeacherProfile::POSITIONS))],
             'level' => ['required', Rule::in(TeacherProfile::LEVELS)],
-            'destination_position' => ['required', Rule::in(array_keys(TeacherProfile::POSITIONS))],
-            'destination_levels' => ['required', 'array', 'min:1', 'max:'.count(TeacherProfile::LEVELS)],
-            'destination_levels.*' => [
-                'required',
-                'distinct',
-                Rule::in($request->input('destination_position') === 'guru_kelas' ? ['SD'] : TeacherProfile::LEVELS),
-            ],
             'subject_id' => ['nullable', 'integer', 'exists:subjects,id'],
-            'destination_subject_ids' => ['nullable', 'array', 'max:50'],
-            'destination_subject_ids.*' => ['integer', 'distinct', 'exists:subjects,id'],
             'destination_sudin_id' => ['required', 'integer', 'exists:sudins,id'],
             'destination_district_codes' => ['nullable', 'array', 'max:44'],
             'destination_district_codes.*' => ['required', 'string', 'distinct', 'regex:/^31\.\d{2}\.\d{2}$/', 'exists:districts,code'],
@@ -65,15 +56,13 @@ class TeacherProfileController extends Controller
             || ! str_starts_with($data['village_code'], $data['district_code'].'.')) {
             return response()->json(['message' => 'Wilayah asal sekolah tidak sesuai hierarki DKI Jakarta.'], 422);
         }
-
         $subjectId = $data['position'] === 'guru_mapel' ? ($data['subject_id'] ?? null) : null;
-        $destinationSubjectIds = $data['destination_position'] === 'guru_mapel' ? ($data['destination_subject_ids'] ?? []) : [];
         if ($data['position'] === 'guru_mapel' && ! $subjectId) {
             return response()->json(['message' => 'Pilih mapel yang kamu ampu.'], 422);
         }
-        if ($data['destination_position'] === 'guru_mapel' && $destinationSubjectIds === []) {
-            return response()->json(['message' => 'Pilih minimal satu mapel tujuan.'], 422);
-        }
+        $destinationPosition = $data['position'];
+        $destinationLevels = [$data['level']];
+        $destinationSubjectIds = $data['position'] === 'guru_mapel' ? [$subjectId] : [];
 
         $phone = $this->normalizePhone($data['phone']);
         if (TeacherProfile::query()
@@ -99,7 +88,7 @@ class TeacherProfileController extends Controller
         }
 
         $wasCreated = $existingProfile === null;
-        $profile = DB::transaction(function () use ($data, $phone, $request, $existingProfile, $destinationDistrictCodes, $subjectId, $destinationSubjectIds) {
+        $profile = DB::transaction(function () use ($data, $phone, $request, $existingProfile, $destinationDistrictCodes, $subjectId, $destinationPosition, $destinationLevels, $destinationSubjectIds) {
             $attributes = [
                 'name' => $data['name'],
                 'phone' => $phone,
@@ -110,7 +99,7 @@ class TeacherProfileController extends Controller
                 'position' => $data['position'],
                 'level' => $data['level'],
                 'subject_id' => $subjectId,
-                'destination_position' => $data['destination_position'],
+                'destination_position' => $destinationPosition,
                 'destination_sudin_id' => $data['destination_sudin_id'],
                 'province_code' => '31',
                 'regency_code' => $data['regency_code'],
@@ -129,7 +118,7 @@ class TeacherProfileController extends Controller
             }
 
             $profile->destinationDistricts()->sync($destinationDistrictCodes);
-            $profile->syncDestinationLevels($data['destination_levels']);
+            $profile->syncDestinationLevels($destinationLevels);
             $profile->destinationSubjects()->sync($destinationSubjectIds);
 
             return $profile;

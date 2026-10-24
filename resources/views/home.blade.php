@@ -31,7 +31,7 @@
             <section class="empty-state dashboard-empty">
                 <span class="empty-symbol">↔</span>
                 <h2>Lengkapi profil tukeranmu</h2>
-                <p>Tambahkan Sudin, jabatan, dan jenjang asal serta tujuan pada profil untuk mulai menemukan calon tukeran.</p>
+                <p>Lengkapi Sudin, jabatan, jenjang, dan mapel asal pada profil; tujuan jabatan dan jenjang mengikuti pilihan saat ini.</p>
                 <a class="button button-primary" href="{{ route('teacher-profile.edit') }}">Perbarui profil</a>
             </section>
         @else

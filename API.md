@@ -67,9 +67,6 @@ Gunakan `GET /api/sudins/{sudin}/districts` untuk daftar kecamatan Sudin. Untuk 
 | `position` | `guru_kelas` atau `guru_mapel` |
 | `level` | `SD`, `SMP`, `SMA`, atau `SMK` |
 | `subject_id` | opsional; wajib jika `position` adalah `guru_mapel` |
-| `destination_position` | `guru_kelas` atau `guru_mapel` |
-| `destination_levels` | array jenjang tujuan; wajib, minimal satu. Untuk `guru_kelas`, harus hanya `SD`; `guru_mapel` dapat memilih beberapa jenjang |
-| `destination_subject_ids` | opsional; minimal satu ID jika posisi tujuan `guru_mapel` |
 | `destination_sudin_id` | ID Sudin tujuan |
 | `destination_district_codes` | opsional; array kode kecamatan tujuan. Kosong/tidak dikirim berarti semua kecamatan dalam Sudin tujuan |
 | `province_code` | harus `31` (DKI Jakarta) |
@@ -77,7 +74,7 @@ Gunakan `GET /api/sudins/{sudin}/districts` untuk daftar kecamatan Sudin. Untuk 
 | `district_code`, `district_name` | kode dan nama kecamatan asal |
 | `village_code`, `village_name` | kode dan nama kelurahan asal |
 
-Kode wilayah harus sesuai hierarki DKI Jakarta, kecamatan asal harus berada dalam Sudin asal, dan setiap kecamatan tujuan harus berada dalam Sudin tujuan. Nomor telepon disimpan dalam format `+62...`.
+Jabatan dan jenjang tujuan otomatis sama dengan jabatan dan jenjang asal. Jika jabatan saat ini `guru_mapel`, mapel tujuan otomatis sama dengan `subject_id`; tujuan mapel tidak perlu dikirim. Field `destination_position`, `destination_levels`, dan `destination_subject_ids` tidak diperlukan dan nilai yang dikirim klien untuk field tersebut tidak digunakan. Kecamatan asal harus berada dalam Sudin asal, dan setiap kecamatan tujuan harus berada dalam Sudin tujuan. Nomor telepon disimpan dalam format `+62...`.
 
 ```json
 {
@@ -89,8 +86,6 @@ Kode wilayah harus sesuai hierarki DKI Jakarta, kecamatan asal harus berada dala
   "sudin_id": 1,
   "position": "guru_kelas",
   "level": "SD",
-  "destination_position": "guru_kelas",
-  "destination_levels": ["SD"],
   "destination_sudin_id": 2,
   "destination_district_codes": ["31.75.07"],
   "province_code": "31",

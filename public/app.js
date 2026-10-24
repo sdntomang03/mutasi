@@ -195,46 +195,23 @@
         }
     }
 
-    const levelBoxes = () => [...document.querySelectorAll('[data-target-level]')];
-
-    // Guru kelas hanya dapat memilih SD; guru mapel dapat memilih beberapa jenjang.
-    function syncLevelRules() {
-        const isClassTeacher = $('#target-position').value === 'guru_kelas';
-        levelBoxes().forEach((box) => {
-            const isElementary = box.value === 'SD';
-            box.closest('.level-option').hidden = isClassTeacher && !isElementary;
-            box.disabled = isClassTeacher && !isElementary;
-            if (isClassTeacher) box.checked = isElementary;
-        });
-        $('#target-level-help').textContent = isClassTeacher
-            ? 'Untuk guru kelas, jenjang tujuan ditetapkan SD.'
-            : $('#target-position').value === 'guru_mapel'
-                ? 'Guru mapel dapat memilih satu atau beberapa jenjang tujuan.'
-                : 'Pilih jabatan tujuan terlebih dahulu. Guru kelas hanya dapat memilih SD; guru mapel dapat memilih beberapa jenjang.';
-    }
-
-    const subjectBoxes = () => [...document.querySelectorAll('[data-target-subject]')];
-
-    // Mapel hanya relevan untuk guru mapel, baik di asal maupun di tujuan.
-    function syncSubjectFields() {
+    $('#origin-position').addEventListener('change', () => {
         const originIsSubject = $('#origin-position').value === 'guru_mapel';
-        const targetIsSubject = $('#target-position').value === 'guru_mapel';
         $('#origin-subject-field').hidden = !originIsSubject;
         $('#origin-subject').required = originIsSubject;
-        $('#target-subject-field').hidden = !targetIsSubject;
-    }
+    });
 
-    $('#origin-position').addEventListener('change', syncSubjectFields);
-    $('#target-position').addEventListener('change', () => { syncLevelRules(); syncSubjectFields(); });
     async function loadExistingProfile() {
         try {
             const result = await api('/profile');
             const profile = result.data;
             if (!profile) return;
 
-            for (const field of ['name', 'phone', 'employment_type', 'position', 'level', 'destination_position', 'school_name', 'school_address', 'sudin_id', 'subject_id']) {
+            for (const field of ['name', 'phone', 'employment_type', 'position', 'level', 'school_name', 'school_address', 'sudin_id', 'subject_id']) {
                 form.elements.namedItem(field).value = profile[field] ?? '';
             }
+            $('#origin-subject-field').hidden = profile.position !== 'guru_mapel';
+            $('#origin-subject').required = profile.position === 'guru_mapel';
 
             $('#origin-regency').value = profile.regency_code;
             await loadDistricts(profile.regency_code, $('#origin-district'));
@@ -242,12 +219,6 @@
             await loadVillages(profile.district_code, $('#origin-village'));
             $('#origin-village').value = profile.village_code;
 
-            const savedLevels = (profile.destination_levels || []).map((item) => item.level);
-            levelBoxes().forEach((box) => { box.checked = savedLevels.includes(box.value); });
-            syncLevelRules();
-            const savedSubjects = (profile.destination_subjects || []).map((item) => String(item.id));
-            subjectBoxes().forEach((box) => { box.checked = savedSubjects.includes(box.value); });
-            syncSubjectFields();
             destinationList.splice(0, destinationList.length);
             if (profile.destination_sudin_id) {
                 $('#target-sudin').value = String(profile.destination_sudin_id);
@@ -379,15 +350,8 @@
             return;
         }
 
-        const selectedLevels = levelBoxes().filter((box) => box.checked).map((box) => box.value);
-        if (!selectedLevels.length) {
-            showToast('Pilih minimal satu jenjang tujuan.', true);
-            return;
-        }
-
-        const selectedSubjects = subjectBoxes().filter((box) => box.checked).map((box) => Number(box.value));
-        if ($('#target-position').value === 'guru_mapel' && !selectedSubjects.length) {
-            showToast('Pilih minimal satu mapel tujuan.', true);
+        if ($('#origin-position').value === 'guru_mapel' && !$('#origin-subject').value) {
+            showToast('Pilih mapel yang kamu ampu.', true);
             return;
         }
 
@@ -402,8 +366,6 @@
         payload.village_name = originVillage.name;
         payload.destination_sudin_id = destinationList[0].sudin_id;
         payload.destination_district_codes = destinationList[0].district_codes;
-        payload.destination_levels = selectedLevels;
-        payload.destination_subject_ids = selectedSubjects;
         payload.subject_id = $('#origin-position').value === 'guru_mapel' ? payload.subject_id : null;
 
         const submit = form.querySelector('[type="submit"]');

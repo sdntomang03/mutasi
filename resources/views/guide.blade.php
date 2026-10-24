@@ -42,9 +42,8 @@
                         pengaturan admin.</li>
                     <li><strong>Tujuan tukeran:</strong> pilih Sudin tujuan, lalu pilih <em>semua kecamatan</em> atau
                         <em>beberapa kecamatan</em> di Sudin tersebut.</li>
-                    <li><strong>Jabatan dan jenjang tujuan:</strong> guru mapel dapat memilih beberapa jenjang tujuan,
-                        guru kelas hanya satu jenjang. Bila tujuanmu guru mapel, pilih satu atau beberapa mapel tujuan
-                        (daftar mapel dikelola admin).</li>
+                    <li><strong>Jabatan, jenjang, dan mapel tujuan</strong> otomatis mengikuti pilihan pada profil
+                        saat ini. Guru mapel akan mencari tukeran dengan guru yang mengampu mapel yang sama.</li>
                 </ul>
             </section>
 
@@ -63,10 +62,8 @@
                         dibatasi.</li>
                     <li>Jabatan tujuan A sama dengan jabatan B saat ini, dan sebaliknya (guru kelas dengan guru kelas,
                         guru mapel dengan guru mapel).</li>
-                    <li>Jenjang sekolah B termasuk dalam jenjang tujuan A, dan jenjang sekolah A termasuk dalam jenjang
-                        tujuan B.</li>
-                    <li>Untuk guru mapel: mapel yang diampu B termasuk dalam mapel tujuan A, dan mapel yang diampu A
-                        termasuk dalam mapel tujuan B. Guru kelas tidak memakai mapel.</li>
+                    <li>Jenjang sekolah asal kedua guru harus sama karena jenjang tujuan mengikuti jenjang saat ini.</li>
+                    <li>Untuk guru mapel, mapel yang diampu kedua guru harus sama. Guru kelas tidak memakai mapel.</li>
                 </ol>
                 <p class="muted-text">Contoh: A guru kelas SD di Jakarta Barat 1 dan ingin ke Jakarta Timur 2 (kecamatan
                     Cakung) sebagai guru kelas SD. B guru kelas SD di Cakung dan ingin ke Jakarta Barat 1 sebagai guru

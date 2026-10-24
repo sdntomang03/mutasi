@@ -46,34 +46,12 @@
     </div>
 
     <div class="section-divider"></div>
-    <div class="section-title destination-title"><div><p class="eyebrow">TUJUAN TUKERAN</p><h3>Di mana kamu ingin bertukar tempat tugas?</h3><p class="field-help">Pilih Sudin tujuan untuk memuat kecamatan sesuai cakupan yang tersimpan di database. Kamu bisa memilih semua kecamatan atau beberapa kecamatan tertentu.</p></div></div>
-    <div class="field-grid destination-role-grid">
-        <label class="field"><span>Jabatan yang dituju</span>
-            <select name="destination_position" id="target-position" required>
-                <option value="">Pilih jabatan tujuan</option>
-                @foreach (\App\Models\TeacherProfile::POSITIONS as $value => $label)
-                    <option value="{{ $value }}">{{ $label }}</option>
-                @endforeach
-            </select>
-        </label>
-        <fieldset class="field level-field" id="target-levels">
-            <span>Jenjang tujuan</span>
-            <div class="level-options">
-                @foreach (\App\Models\TeacherProfile::LEVELS as $level)
-                    <label class="level-option"><input type="checkbox" value="{{ $level }}" data-target-level> {{ $level }}</label>
-                @endforeach
-            </div>
-            <small class="field-help" id="target-level-help">Pilih jabatan tujuan terlebih dahulu. Guru kelas hanya dapat memilih SD; guru mapel dapat memilih beberapa jenjang.</small>
-        </fieldset>
-        <fieldset class="field level-field field-wide" id="target-subject-field" hidden>
-            <span>Mapel tujuan</span>
-            <div class="level-options">
-                @foreach ($subjects as $subject)
-                    <label class="level-option"><input type="checkbox" value="{{ $subject->id }}" data-target-subject> {{ $subject->name }}</label>
-                @endforeach
-            </div>
-            <small class="field-help">Pilih satu atau beberapa mapel yang ingin kamu ampu di sekolah tujuan.</small>
-        </fieldset>
+    <div class="section-title destination-title">
+        <div>
+            <p class="eyebrow">TUJUAN TUKERAN</p>
+            <h3>Di mana kamu ingin bertukar tempat tugas?</h3>
+            <p class="field-help">Jabatan, jenjang, dan mapel tujuan otomatis mengikuti profil asal. Pilih Sudin tujuan dan cakupan kecamatannya di bawah.</p>
+        </div>
     </div>
     <div class="destination-builder">
         <div class="field-grid">
