@@ -5,7 +5,7 @@
 @section('content')
 <div class="page-shell">
     @include('partials.app-header')
-    <main class="profile-main">
+    <main class="profile-main teacher-profile-main">
         <a class="back-link" href="{{ route('dashboard') }}">← Kembali ke dashboard</a>
         <section class="dashboard-heading profile-heading">
             <div>
