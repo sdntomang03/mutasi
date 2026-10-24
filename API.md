@@ -32,6 +32,15 @@ Respons sukses berisi `data.token`, `data.token_type`, `data.abilities`, dan `da
 - Email reset yang dibatasi mengembalikan `429`. Kegagalan pengiriman email kecocokan atau layanan data kelurahan dapat mengembalikan `502`.
 - API belum memiliki prefix versi atau pagination.
 
+## API autentikasi publik
+
+| Method | Endpoint | Keterangan |
+| --- | --- | --- |
+| `POST` | `/api/register` | Mendaftarkan akun guru baru dan mengirim email verifikasi. Gunakan `name`, `email`, `password`, dan `password_confirmation`. |
+| `POST` | `/api/forgot-password` | Meminta tautan reset kata sandi melalui email. Tautan mengarah ke halaman reset Laravel. |
+
+Email harus diverifikasi sebelum akun dapat masuk melalui API.
+
 ## API guru
 
 | Method | Endpoint | Keterangan |
