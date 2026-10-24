@@ -30,6 +30,7 @@ Route::middleware(['auth', 'verified', 'role:guru'])->group(function () {
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::view('/sudins', 'admin.sudins')->name('sudins');
     Route::view('/subjects', 'admin.subjects')->name('subjects');
+    Route::get('/users/export', [TeacherManagementController::class, 'export'])->name('users.export');
     Route::get('/users', [TeacherManagementController::class, 'index'])->name('users');
     Route::get('/deletion-requests', [TeacherManagementController::class, 'deletionRequests'])->name('deletion-requests');
     Route::get('/match-notifications', [MatchNotificationController::class, 'index'])->name('match-notifications');

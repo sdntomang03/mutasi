@@ -16,6 +16,7 @@
         <section class="panel admin-users-panel">
             <div class="panel-heading"><div><p class="eyebrow">AKUN TERDAFTAR</p><h2>User terdaftar</h2></div><span class="step-number">{{ $users->count() }}</span></div>
             <div class="dt-toolbar">
+                <a class="button button-secondary" href="{{ route('admin.users.export') }}">Unduh Excel (CSV)</a>
                 <label class="dt-length"><span>Tampilkan</span>
                     <select id="dt-length"><option>10</option><option>25</option><option>50</option><option>100</option></select>
                 </label>

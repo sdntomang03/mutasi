@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
+use RuntimeException;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TeacherManagementController extends Controller
 {
@@ -32,6 +34,107 @@ class TeacherManagementController extends Controller
                 ->latest()
                 ->get(),
         ]);
+    }
+
+    public function export(): StreamedResponse
+    {
+        $profiles = TeacherProfile::query()
+            ->whereNotNull('destination_sudin_id')
+            ->with([
+                'user:id,name,email',
+                'sudin:id,name,abbreviation',
+                'destinationSudin:id,name,abbreviation',
+                'destinationDistricts:code,name',
+                'destinationLevels:id,teacher_profile_id,level',
+                'subject:id,name',
+                'destinationSubjects:id,name',
+            ]);
+
+        return response()->streamDownload(function () use ($profiles): void {
+            $output = fopen('php://output', 'w');
+
+            if ($output === false) {
+                throw new RuntimeException('Tidak dapat membuka aliran ekspor data user.');
+            }
+
+            try {
+                if (fwrite($output, "\xEF\xBB\xBF") === false) {
+                    throw new RuntimeException('Tidak dapat menulis data ekspor user.');
+                }
+
+                $writeRow = static function (array $row) use ($output): void {
+                    if (fputcsv($output, $row, ',', '"', '', "\r\n") === false) {
+                        throw new RuntimeException('Tidak dapat menulis data ekspor user.');
+                    }
+                };
+
+                $writeRow([
+                    'Nama guru',
+                    'Email',
+                    'No. HP',
+                    'Status kepegawaian',
+                    'Sekolah asal',
+                    'Alamat sekolah asal',
+                    'Sudin asal',
+                    'Kabupaten/Kota asal',
+                    'Kecamatan asal',
+                    'Kelurahan asal',
+                    'Jabatan asal',
+                    'Jenjang asal',
+                    'Mata pelajaran asal',
+                    'Sudin tujuan',
+                    'Kecamatan tujuan',
+                    'Jabatan tujuan',
+                    'Jenjang tujuan',
+                    'Mata pelajaran tujuan',
+                    'Status tukeran',
+                ]);
+
+                foreach ($profiles->lazyById(200) as $profile) {
+                    $originPosition = $profile->position
+                        ? TeacherProfile::POSITIONS[$profile->position] ?? $profile->position
+                        : '';
+                    $destinationPosition = $profile->destination_position
+                        ? TeacherProfile::POSITIONS[$profile->destination_position] ?? $profile->destination_position
+                        : '';
+                    $destinationDistricts = $profile->destinationDistricts->pluck('name')->sort()->values()->join(', ');
+
+                    $writeRow(array_map(
+                        fn (string $value): string => $this->safeCsvValue($value),
+                        [
+                            $profile->name,
+                            $profile->user?->email ?? '',
+                            $profile->phone,
+                            $profile->employment_type,
+                            $profile->school_name,
+                            $profile->school_address,
+                            $profile->sudin?->abbreviation ?: ($profile->sudin?->name ?? ''),
+                            $profile->regency_name,
+                            $profile->district_name,
+                            $profile->village_name,
+                            $originPosition,
+                            $profile->level ?? '',
+                            $profile->subject?->name ?? '',
+                            $profile->destinationSudin?->abbreviation ?: ($profile->destinationSudin?->name ?? ''),
+                            $destinationDistricts ?: 'Semua kecamatan di Sudin tujuan',
+                            $destinationPosition,
+                            $profile->destinationLevels->pluck('level')->sort()->values()->join(', '),
+                            $profile->destinationSubjects->pluck('name')->sort()->values()->join(', '),
+                            $profile->is_mutated ? 'Sudah tukeran' : 'Belum tukeran',
+                        ],
+                    ));
+                }
+            } finally {
+                fclose($output);
+            }
+        }, 'data-user-mutasi.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
+    private function safeCsvValue(string $value): string
+    {
+        return preg_match('/^[\x00-\x20]*[=+\-@]/', $value) === 1
+            ? "'".$value
+            : $value;
     }
 
     public function deletionRequests(): View
