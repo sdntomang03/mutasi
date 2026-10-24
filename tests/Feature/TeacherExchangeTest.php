@@ -132,7 +132,8 @@ class TeacherExchangeTest extends TestCase
         $origin = $this->district('31.71.01', 'Kecamatan A', '31.71', 'Kota Administrasi Jakarta Pusat');
         $destination = $this->district('31.72.01', 'Kecamatan B', '31.72', 'Kota Administrasi Jakarta Utara');
         $sudin = $this->sudinFor($origin, 'Jakarta Pusat 1');
-        $this->sudinFor($destination, 'Jakarta Utara 1');
+        $destinationSudin = $this->sudinFor($destination, 'Jakarta Utara 1');
+        $destinationSudin->update(['abbreviation' => 'JU I']);
         $user = $this->teacherUser('profile@example.test');
         $payload = $this->profilePayload($sudin, $origin, $destination);
 
@@ -143,6 +144,9 @@ class TeacherExchangeTest extends TestCase
         $this->actingAs($user)->getJson('/api/profile')
             ->assertOk()
             ->assertJsonPath('data.school_name', 'SDN Contoh')
+            ->assertJsonPath('data.destination_sudin.id', $destinationSudin->id)
+            ->assertJsonPath('data.destination_sudin.name', 'Jakarta Utara 1')
+            ->assertJsonPath('data.destination_sudin.abbreviation', 'JU I')
             ->assertJsonPath('data.destination_districts.0.code', $destination->code);
 
         $payload['school_name'] = 'SDN Diperbarui';

@@ -16,7 +16,7 @@ class TeacherProfileController extends Controller
     public function show(Request $request): JsonResponse
     {
         $profile = $request->user()->teacherProfile()
-            ->with(['destinationSudin:id,name', 'destinationDistricts:code,name,regency_code,regency_name', 'destinationLevels', 'sudin:id,name', 'subject:id,name', 'destinationSubjects:id,name'])
+            ->with(['destinationSudin:id,name,abbreviation', 'destinationDistricts:code,name,regency_code,regency_name', 'destinationLevels', 'sudin:id,name,abbreviation', 'subject:id,name', 'destinationSubjects:id,name'])
             ->first();
 
         return response()->json([
@@ -129,7 +129,7 @@ class TeacherProfileController extends Controller
         $matchNotifier->notifyFor($profile, $matchFinder);
 
         return response()->json([
-            'data' => $profile->load(['destinationSudin:id,name', 'destinationDistricts:code,name,regency_code,regency_name', 'destinationLevels', 'sudin:id,name', 'subject:id,name', 'destinationSubjects:id,name']),
+            'data' => $profile->load(['destinationSudin:id,name,abbreviation', 'destinationDistricts:code,name,regency_code,regency_name', 'destinationLevels', 'sudin:id,name,abbreviation', 'subject:id,name', 'destinationSubjects:id,name']),
             'message' => $wasCreated
                 ? 'Profil tersimpan. Mencari guru yang cocok dua arah berdasarkan Sudin.'
                 : 'Profil berhasil diperbarui.',
