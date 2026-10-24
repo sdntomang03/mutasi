@@ -723,6 +723,13 @@ class TeacherExchangeTest extends TestCase
         $classTeacher = $this->teacherUser('class-teacher@example.test');
         $classPayload = $this->profilePayload($sudinA, $originA, $originB);
 
+        $this->actingAs($classTeacher)->postJson('/api/profile', [
+            ...$classPayload,
+            'level' => 'SMP',
+        ])->assertJsonValidationErrors('level');
+
+        $this->assertDatabaseMissing('teacher_profiles', ['user_id' => $classTeacher->id]);
+
         $this->actingAs($classTeacher)->postJson('/api/profile', $classPayload)
             ->assertCreated()
             ->assertJsonPath('data.destination_position', 'guru_kelas')

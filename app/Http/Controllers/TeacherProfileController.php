@@ -38,7 +38,10 @@ class TeacherProfileController extends Controller
             'school_address' => ['required', 'string', 'max:1000'],
             'sudin_id' => ['required', 'integer', 'exists:sudins,id'],
             'position' => ['required', Rule::in(array_keys(TeacherProfile::POSITIONS))],
-            'level' => ['required', Rule::in(TeacherProfile::LEVELS)],
+            'level' => [
+                'required',
+                Rule::in($request->input('position') === 'guru_kelas' ? ['SD'] : TeacherProfile::LEVELS),
+            ],
             'subject_id' => ['nullable', 'integer', 'exists:subjects,id'],
             'destination_sudin_id' => ['required', 'integer', 'exists:sudins,id'],
             'destination_district_codes' => ['nullable', 'array', 'max:44'],

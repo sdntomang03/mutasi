@@ -20,9 +20,10 @@
             <select name="level" id="origin-level" required>
                 <option value="">Pilih jenjang</option>
                 @foreach (\App\Models\TeacherProfile::LEVELS as $level)
-                    <option value="{{ $level }}">{{ $level }}</option>
+                    <option value="{{ $level }}" data-origin-level>{{ $level }}</option>
                 @endforeach
             </select>
+            <small class="field-help" id="origin-level-help">Guru kelas hanya dapat memilih SD.</small>
         </label>
         <label class="field" id="origin-subject-field" hidden><span>Mapel yang diampu</span>
             <select name="subject_id" id="origin-subject">

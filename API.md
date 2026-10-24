@@ -65,7 +65,7 @@ Gunakan `GET /api/sudins/{sudin}/districts` untuk daftar kecamatan Sudin. Untuk 
 | `school_address` | string, maksimal 1000 karakter |
 | `sudin_id` | ID Sudin asal |
 | `position` | `guru_kelas` atau `guru_mapel` |
-| `level` | `SD`, `SMP`, `SMA`, atau `SMK` |
+| `level` | `SD`, `SMP`, `SMA`, atau `SMK`; wajib `SD` jika `position` adalah `guru_kelas` |
 | `subject_id` | opsional; wajib jika `position` adalah `guru_mapel` |
 | `destination_sudin_id` | ID Sudin tujuan |
 | `destination_district_codes` | opsional; array kode kecamatan tujuan. Kosong/tidak dikirim berarti semua kecamatan dalam Sudin tujuan |

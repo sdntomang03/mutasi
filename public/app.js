@@ -195,11 +195,28 @@
         }
     }
 
+    function syncOriginLevelOptions() {
+        const isClassTeacher = $('#origin-position').value === 'guru_kelas';
+        document.querySelectorAll('[data-origin-level]').forEach((option) => {
+            const isElementary = option.value === 'SD';
+            option.hidden = isClassTeacher && !isElementary;
+            option.disabled = isClassTeacher && !isElementary;
+        });
+        $('#origin-level-help').textContent = isClassTeacher
+            ? 'Untuk guru kelas, jenjang sekolah hanya SD.'
+            : 'Pilih jenjang sekolah tempat kamu mengajar.';
+        if (isClassTeacher) {
+            $('#origin-level').value = 'SD';
+        }
+    }
+
     $('#origin-position').addEventListener('change', () => {
+        syncOriginLevelOptions();
         const originIsSubject = $('#origin-position').value === 'guru_mapel';
         $('#origin-subject-field').hidden = !originIsSubject;
         $('#origin-subject').required = originIsSubject;
     });
+    syncOriginLevelOptions();
 
     async function loadExistingProfile() {
         try {
@@ -210,6 +227,7 @@
             for (const field of ['name', 'phone', 'employment_type', 'position', 'level', 'school_name', 'school_address', 'sudin_id', 'subject_id']) {
                 form.elements.namedItem(field).value = profile[field] ?? '';
             }
+            syncOriginLevelOptions();
             $('#origin-subject-field').hidden = profile.position !== 'guru_mapel';
             $('#origin-subject').required = profile.position === 'guru_mapel';
 
