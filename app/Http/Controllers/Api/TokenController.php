@@ -38,6 +38,12 @@ class TokenController extends Controller
             ], 422);
         }
 
+        if (! $user->hasVerifiedEmail()) {
+            return response()->json([
+                'message' => 'Email belum diverifikasi. Silakan buka tautan yang kami kirim ke email Anda.',
+            ], 403);
+        }
+
         $abilities = $user->getRoleNames()
             ->intersect(['guru', 'admin'])
             ->values()

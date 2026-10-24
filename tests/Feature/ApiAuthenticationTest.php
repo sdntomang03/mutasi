@@ -61,4 +61,21 @@ class ApiAuthenticationTest extends TestCase
 
         Notification::assertSentTo($user, ResetPassword::class);
     }
+
+    public function test_unverified_user_cannot_sign_in_through_api(): void
+    {
+        $user = User::factory()->unverified()->create();
+        $user->assignRole(Role::findOrCreate('guru', 'web'));
+
+        $this->postJson('/api/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ])->assertForbidden()
+            ->assertJsonPath(
+                'message',
+                'Email belum diverifikasi. Silakan buka tautan yang kami kirim ke email Anda.'
+            );
+
+        $this->assertDatabaseCount('personal_access_tokens', 0);
+    }
 }
