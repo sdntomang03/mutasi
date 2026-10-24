@@ -15,7 +15,7 @@ class AdminUserExportTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_admin_can_download_excel_compatible_csv_for_profiles_with_mutation_destinations(): void
+    public function test_admin_can_download_excel_workbook_for_profiles_with_mutation_destinations(): void
     {
         Role::findOrCreate('admin', 'web');
 
@@ -47,7 +47,7 @@ class AdminUserExportTest extends TestCase
             'phone' => '+628123456789',
             'employment_type' => 'PNS',
             'school_name' => 'SDN Contoh',
-            'school_address' => 'Jl. Mawar No. 1',
+            'school_address' => '  Jl. Mawar No. 1  ',
             'sudin_id' => $originSudin->id,
             'destination_sudin_id' => $destinationSudin->id,
             'position' => 'guru_mapel',
@@ -68,65 +68,59 @@ class AdminUserExportTest extends TestCase
 
         $response = $this->actingAs($admin)->get(route('admin.users.export'));
 
-        $response->assertDownload('data-user-mutasi.csv')
-            ->assertStreamed();
+        $response->assertDownload('data-user-mutasi.xlsx')
+            ->assertStreamed()
+            ->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         $this->actingAs($admin)->get(route('admin.users'))
-            ->assertOk()
-            ->assertSee('Unduh Excel (CSV)')
+            ->assertSee('Unduh Excel')
             ->assertSee(route('admin.users.export'));
 
         $content = $response->streamedContent();
-        $this->assertStringStartsWith("\xEF\xBB\xBF", $content);
-        $rows = array_map(
-            fn (string $row): array => str_getcsv($row, ',', '"', ''),
-            array_filter(explode("\r\n", substr($content, 3)), fn (string $row): bool => $row !== ''),
-        );
+        $this->assertStringStartsWith("PK\x03\x04", $content);
 
-        $this->assertSame([
-            'Nama guru',
-            'Email',
-            'No. HP',
-            'Status kepegawaian',
-            'Sekolah asal',
-            'Alamat sekolah asal',
-            'Sudin asal',
-            'Kabupaten/Kota asal',
-            'Kecamatan asal',
-            'Kelurahan asal',
-            'Jabatan asal',
-            'Jenjang asal',
-            'Mata pelajaran asal',
-            'Sudin tujuan',
-            'Kecamatan tujuan',
-            'Jabatan tujuan',
-            'Jenjang tujuan',
-            'Mata pelajaran tujuan',
-            'Status tukeran',
-        ], $rows[0]);
-        $this->assertSame([
-            "'=1+1",
-            'lengkap@example.test',
-            "'+628123456789",
-            'PNS',
-            'SDN Contoh',
-            'Jl. Mawar No. 1',
-            'ASAL',
-            'Kota Asal',
-            'Kecamatan Asal',
-            'Kelurahan Asal',
-            'Guru mapel',
-            'SD',
-            'Mapel Uji Ekspor',
-            'TUJUAN',
-            'Kecamatan Tujuan',
-            'Guru mapel',
-            'SMA, SMP',
-            'Mapel Uji Ekspor',
-            'Belum tukeran',
-        ], $rows[1]);
-        $this->assertCount(2, $rows);
-        $this->assertStringNotContainsString('Profil belum memilih tujuan', $content);
-        $this->assertStringNotContainsString('tanpa-profil@example.test', $content);
+        $workbookPath = tempnam(sys_get_temp_dir(), 'mutasi-test-');
+        $this->assertIsString($workbookPath);
+
+        try {
+            $this->assertSame(strlen($content), file_put_contents($workbookPath, $content));
+
+            $archive = new \ZipArchive;
+            $this->assertTrue($archive->open($workbookPath) === true);
+
+            try {
+                $this->assertNotFalse($archive->getFromName('[Content_Types].xml'));
+                $this->assertNotFalse($archive->getFromName('_rels/.rels'));
+                $this->assertNotFalse($archive->getFromName('xl/workbook.xml'));
+                $this->assertNotFalse($archive->getFromName('xl/_rels/workbook.xml.rels'));
+                $worksheet = $archive->getFromName('xl/worksheets/sheet1.xml');
+                $this->assertIsString($worksheet);
+
+                $document = new \DOMDocument;
+                $this->assertTrue($document->loadXML($worksheet));
+                $xpath = new \DOMXPath($document);
+                $xpath->registerNamespace('sheet', 'http://schemas.openxmlformats.org/spreadsheetml/2006/main');
+
+                $this->assertSame('Nama guru', $xpath->evaluate('string(//sheet:c[@r="A1"]/sheet:is/sheet:t)'));
+                $this->assertSame('=1+1', $xpath->evaluate('string(//sheet:c[@r="A2"]/sheet:is/sheet:t)'));
+                $this->assertSame('inlineStr', $xpath->evaluate('string(//sheet:c[@r="A2"]/@t)'));
+                $this->assertSame('lengkap@example.test', $xpath->evaluate('string(//sheet:c[@r="B2"]/sheet:is/sheet:t)'));
+                $this->assertSame('+628123456789', $xpath->evaluate('string(//sheet:c[@r="C2"]/sheet:is/sheet:t)'));
+                $this->assertSame('  Jl. Mawar No. 1  ', $xpath->evaluate('string(//sheet:c[@r="F2"]/sheet:is/sheet:t)'));
+                $this->assertSame('ASAL', $xpath->evaluate('string(//sheet:c[@r="G2"]/sheet:is/sheet:t)'));
+                $this->assertSame('TUJUAN', $xpath->evaluate('string(//sheet:c[@r="N2"]/sheet:is/sheet:t)'));
+                $this->assertSame('Kecamatan Tujuan', $xpath->evaluate('string(//sheet:c[@r="O2"]/sheet:is/sheet:t)'));
+                $this->assertSame('SMA, SMP', $xpath->evaluate('string(//sheet:c[@r="Q2"]/sheet:is/sheet:t)'));
+                $this->assertSame('Belum tukeran', $xpath->evaluate('string(//sheet:c[@r="S2"]/sheet:is/sheet:t)'));
+                $this->assertSame('2', $xpath->evaluate('string(count(//sheet:sheetData/sheet:row))'));
+                $this->assertFalse($xpath->query('//sheet:c/sheet:f')->length > 0);
+                $this->assertStringNotContainsString('Profil belum memilih tujuan', $worksheet);
+                $this->assertStringNotContainsString('tanpa-profil@example.test', $worksheet);
+            } finally {
+                $archive->close();
+            }
+        } finally {
+            unlink($workbookPath);
+        }
     }
 
     public function test_user_export_requires_admin_role(): void

@@ -7,6 +7,7 @@ use App\Models\ProfileDeletionRequest;
 use App\Models\TeacherProfile;
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -51,90 +52,208 @@ class TeacherManagementController extends Controller
             ]);
 
         return response()->streamDownload(function () use ($profiles): void {
-            $output = fopen('php://output', 'w');
+            $worksheetPath = tempnam(sys_get_temp_dir(), 'mutasi-sheet-');
+            $workbookPath = tempnam(sys_get_temp_dir(), 'mutasi-xlsx-');
 
-            if ($output === false) {
-                throw new RuntimeException('Tidak dapat membuka aliran ekspor data user.');
+            if ($worksheetPath === false || $workbookPath === false) {
+                if ($worksheetPath !== false) {
+                    unlink($worksheetPath);
+                }
+
+                if ($workbookPath !== false) {
+                    unlink($workbookPath);
+                }
+
+                throw new RuntimeException('Tidak dapat menyiapkan berkas ekspor Excel.');
             }
 
             try {
-                if (fwrite($output, "\xEF\xBB\xBF") === false) {
-                    throw new RuntimeException('Tidak dapat menulis data ekspor user.');
-                }
+                $this->writeMutationWorksheet($worksheetPath, $profiles);
+                $this->createMutationWorkbook($worksheetPath, $workbookPath);
 
-                $writeRow = static function (array $row) use ($output): void {
-                    if (fputcsv($output, $row, ',', '"', '', "\r\n") === false) {
-                        throw new RuntimeException('Tidak dapat menulis data ekspor user.');
-                    }
-                };
-
-                $writeRow([
-                    'Nama guru',
-                    'Email',
-                    'No. HP',
-                    'Status kepegawaian',
-                    'Sekolah asal',
-                    'Alamat sekolah asal',
-                    'Sudin asal',
-                    'Kabupaten/Kota asal',
-                    'Kecamatan asal',
-                    'Kelurahan asal',
-                    'Jabatan asal',
-                    'Jenjang asal',
-                    'Mata pelajaran asal',
-                    'Sudin tujuan',
-                    'Kecamatan tujuan',
-                    'Jabatan tujuan',
-                    'Jenjang tujuan',
-                    'Mata pelajaran tujuan',
-                    'Status tukeran',
-                ]);
-
-                foreach ($profiles->lazyById(200) as $profile) {
-                    $originPosition = $profile->position
-                        ? TeacherProfile::POSITIONS[$profile->position] ?? $profile->position
-                        : '';
-                    $destinationPosition = $profile->destination_position
-                        ? TeacherProfile::POSITIONS[$profile->destination_position] ?? $profile->destination_position
-                        : '';
-                    $destinationDistricts = $profile->destinationDistricts->pluck('name')->sort()->values()->join(', ');
-
-                    $writeRow(array_map(
-                        fn (string $value): string => $this->safeCsvValue($value),
-                        [
-                            $profile->name,
-                            $profile->user?->email ?? '',
-                            $profile->phone,
-                            $profile->employment_type,
-                            $profile->school_name,
-                            $profile->school_address,
-                            $profile->sudin?->abbreviation ?: ($profile->sudin?->name ?? ''),
-                            $profile->regency_name,
-                            $profile->district_name,
-                            $profile->village_name,
-                            $originPosition,
-                            $profile->level ?? '',
-                            $profile->subject?->name ?? '',
-                            $profile->destinationSudin?->abbreviation ?: ($profile->destinationSudin?->name ?? ''),
-                            $destinationDistricts ?: 'Semua kecamatan di Sudin tujuan',
-                            $destinationPosition,
-                            $profile->destinationLevels->pluck('level')->sort()->values()->join(', '),
-                            $profile->destinationSubjects->pluck('name')->sort()->values()->join(', '),
-                            $profile->is_mutated ? 'Sudah tukeran' : 'Belum tukeran',
-                        ],
-                    ));
+                if (readfile($workbookPath) === false) {
+                    throw new RuntimeException('Tidak dapat mengirim berkas ekspor Excel.');
                 }
             } finally {
-                fclose($output);
+                unlink($worksheetPath);
+                unlink($workbookPath);
             }
-        }, 'data-user-mutasi.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
+        }, 'data-user-mutasi.xlsx', [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
     }
 
-    private function safeCsvValue(string $value): string
+    private function writeMutationWorksheet(string $path, Builder $profiles): void
     {
-        return preg_match('/^[\x00-\x20]*[=+\-@]/', $value) === 1
-            ? "'".$value
-            : $value;
+        $writer = new \XMLWriter;
+
+        if (! $writer->openUri($path)) {
+            throw new RuntimeException('Tidak dapat membuat lembar kerja ekspor Excel.');
+        }
+
+        if (! $writer->startDocument('1.0', 'UTF-8', 'yes')
+            || ! $writer->startElement('worksheet')
+            || ! $writer->writeAttribute('xmlns', 'http://schemas.openxmlformats.org/spreadsheetml/2006/main')
+            || ! $writer->startElement('sheetData')) {
+            throw new RuntimeException('Tidak dapat menulis lembar kerja ekspor Excel.');
+        }
+
+        $headers = [
+            'Nama guru',
+            'Email',
+            'No. HP',
+            'Status kepegawaian',
+            'Sekolah asal',
+            'Alamat sekolah asal',
+            'Sudin asal',
+            'Kabupaten/Kota asal',
+            'Kecamatan asal',
+            'Kelurahan asal',
+            'Jabatan asal',
+            'Jenjang asal',
+            'Mata pelajaran asal',
+            'Sudin tujuan',
+            'Kecamatan tujuan',
+            'Jabatan tujuan',
+            'Jenjang tujuan',
+            'Mata pelajaran tujuan',
+            'Status tukeran',
+        ];
+
+        $this->writeMutationWorksheetRow($writer, 1, $headers);
+
+        $rowNumber = 2;
+        foreach ($profiles->lazyById(200) as $profile) {
+            $originPosition = $profile->position
+                ? TeacherProfile::POSITIONS[$profile->position] ?? $profile->position
+                : '';
+            $destinationPosition = $profile->destination_position
+                ? TeacherProfile::POSITIONS[$profile->destination_position] ?? $profile->destination_position
+                : '';
+            $destinationDistricts = $profile->destinationDistricts->pluck('name')->sort()->values()->join(', ');
+
+            $this->writeMutationWorksheetRow($writer, $rowNumber++, [
+                $profile->name,
+                $profile->user?->email ?? '',
+                $profile->phone,
+                $profile->employment_type,
+                $profile->school_name,
+                $profile->school_address,
+                $profile->sudin?->abbreviation ?: ($profile->sudin?->name ?? ''),
+                $profile->regency_name,
+                $profile->district_name,
+                $profile->village_name,
+                $originPosition,
+                $profile->level ?? '',
+                $profile->subject?->name ?? '',
+                $profile->destinationSudin?->abbreviation ?: ($profile->destinationSudin?->name ?? ''),
+                $destinationDistricts ?: 'Semua kecamatan di Sudin tujuan',
+                $destinationPosition,
+                $profile->destinationLevels->pluck('level')->sort()->values()->join(', '),
+                $profile->destinationSubjects->pluck('name')->sort()->values()->join(', '),
+                $profile->is_mutated ? 'Sudah tukeran' : 'Belum tukeran',
+            ]);
+        }
+
+        if (! $writer->endElement() || ! $writer->endElement() || ! $writer->endDocument()) {
+            throw new RuntimeException('Tidak dapat menyelesaikan lembar kerja ekspor Excel.');
+        }
+
+        if ($writer->flush() === false) {
+            throw new RuntimeException('Tidak dapat menyelesaikan lembar kerja ekspor Excel.');
+        }
+    }
+
+    /**
+     * @param  array<int, string>  $values
+     */
+    private function writeMutationWorksheetRow(\XMLWriter $writer, int $rowNumber, array $values): void
+    {
+        if (! $writer->startElement('row') || ! $writer->writeAttribute('r', (string) $rowNumber)) {
+            throw new RuntimeException('Tidak dapat menulis baris lembar kerja ekspor Excel.');
+        }
+
+        foreach ($values as $index => $value) {
+            if (! $writer->startElement('c')
+                || ! $writer->writeAttribute('r', $this->spreadsheetColumnName($index + 1).$rowNumber)
+                || ! $writer->writeAttribute('t', 'inlineStr')
+                || ! $writer->startElement('is')) {
+                throw new RuntimeException('Tidak dapat menulis sel lembar kerja ekspor Excel.');
+            }
+
+            if ($value !== trim($value) && ! $writer->writeAttribute('xml:space', 'preserve')) {
+                throw new RuntimeException('Tidak dapat mempertahankan format teks ekspor Excel.');
+            }
+
+            if (! $writer->writeElement('t', $value) || ! $writer->endElement() || ! $writer->endElement()) {
+                throw new RuntimeException('Tidak dapat menulis nilai sel ekspor Excel.');
+            }
+        }
+
+        if (! $writer->endElement()) {
+            throw new RuntimeException('Tidak dapat menyelesaikan baris lembar kerja ekspor Excel.');
+        }
+    }
+
+    private function spreadsheetColumnName(int $columnNumber): string
+    {
+        $columnName = '';
+
+        while ($columnNumber > 0) {
+            $columnNumber--;
+            $columnName = chr(($columnNumber % 26) + 65).$columnName;
+            $columnNumber = intdiv($columnNumber, 26);
+        }
+
+        return $columnName;
+    }
+
+    private function createMutationWorkbook(string $worksheetPath, string $workbookPath): void
+    {
+        $archive = new \ZipArchive;
+
+        if ($archive->open($workbookPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
+            throw new RuntimeException('Tidak dapat membuat berkas ekspor Excel.');
+        }
+
+        $parts = [
+            '[Content_Types].xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+                .'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+                .'<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+                .'<Default Extension="xml" ContentType="application/xml"/>'
+                .'<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
+                .'<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>'
+                .'</Types>',
+            '_rels/.rels' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+                .'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+                .'<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>'
+                .'</Relationships>',
+            'xl/workbook.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+                .'<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+                .'<sheets><sheet name="Data Mutasi" sheetId="1" r:id="rId1"/></sheets></workbook>',
+            'xl/_rels/workbook.xml.rels' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+                .'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+                .'<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>'
+                .'</Relationships>',
+        ];
+
+        foreach ($parts as $name => $content) {
+            if (! $archive->addFromString($name, $content)) {
+                $archive->close();
+
+                throw new RuntimeException('Tidak dapat menambahkan bagian berkas ekspor Excel.');
+            }
+        }
+
+        if (! $archive->addFile($worksheetPath, 'xl/worksheets/sheet1.xml')) {
+            $archive->close();
+
+            throw new RuntimeException('Tidak dapat menambahkan lembar kerja ke berkas ekspor Excel.');
+        }
+
+        if (! $archive->close()) {
+            throw new RuntimeException('Tidak dapat menyelesaikan berkas ekspor Excel.');
+        }
     }
 
     public function deletionRequests(): View
