@@ -41,6 +41,7 @@ Respons sukses berisi `data.token`, `data.token_type`, `data.abilities`, dan `da
 | `GET` | `/api/sudins` | Daftar Sudin untuk guru. |
 | `GET` | `/api/sudins/{sudin}/districts` | Daftar kecamatan dalam Sudin. |
 | `GET` | `/api/sudins/{sudin}/districts/{district}/villages` | Daftar kelurahan dalam kecamatan Sudin; data diambil dari layanan wilayah eksternal. |
+| `GET` | `/api/subjects` | Daftar mata pelajaran untuk pilihan pada profil guru. |
 | `GET` | `/api/profile` | Profil guru saat ini; `data` bernilai `null` jika belum ada. |
 | `POST` | `/api/profile` | Membuat atau memperbarui profil. Batas 10 permintaan per menit. |
 | `GET` | `/api/teachers` | Daftar guru lain dengan jabatan asal sama seperti profil pemanggil. |

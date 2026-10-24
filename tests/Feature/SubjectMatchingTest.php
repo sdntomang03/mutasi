@@ -104,6 +104,17 @@ class SubjectMatchingTest extends TestCase
         $this->get('/admin/subjects')->assertOk()->assertSee('Mata pelajaran');
     }
 
+    public function test_teacher_can_read_subjects_without_admin_permissions(): void
+    {
+        $subject = Subject::factory()->create(['name' => 'Mapel untuk Guru']);
+        $teacher = $this->teacher();
+
+        $this->actingAs($teacher)
+            ->getJson('/api/subjects')
+            ->assertOk()
+            ->assertJsonFragment(['id' => $subject->id, 'name' => 'Mapel untuk Guru']);
+    }
+
     public function test_admin_imports_subjects_from_csv_skipping_duplicates_and_header(): void
     {
         $admin = User::factory()->create();

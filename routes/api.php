@@ -22,6 +22,7 @@ Route::middleware('auth:sanctum')->group(function (): void {
         Route::get('/sudins', [SudinController::class, 'publicIndex']);
         Route::get('/sudins/{sudin}/districts', [SudinController::class, 'districts']);
         Route::get('/sudins/{sudin}/districts/{district}/villages', [SudinController::class, 'villages']);
+        Route::get('/subjects', [SubjectController::class, 'index']);
         Route::get('/profile', [TeacherProfileController::class, 'show']);
         Route::post('/profile', [TeacherProfileController::class, 'store'])->middleware('throttle:10,1');
         Route::get('/teachers', [TeacherDirectoryController::class, 'apiIndex'])->name('api.teachers.index');
