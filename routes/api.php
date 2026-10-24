@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\MatchNotificationController;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Admin\TeacherManagementController;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\TokenController;
 use App\Http\Controllers\MatchController;
 use App\Http\Controllers\SudinController;
@@ -10,6 +11,13 @@ use App\Http\Controllers\TeacherDirectoryController;
 use App\Http\Controllers\TeacherLifecycleController;
 use App\Http\Controllers\TeacherProfileController;
 use Illuminate\Support\Facades\Route;
+
+Route::post('/register', [AuthController::class, 'register'])
+    ->middleware('throttle:6,1')
+    ->name('api.register');
+Route::post('/forgot-password', [AuthController::class, 'sendPasswordResetLink'])
+    ->middleware('throttle:6,1')
+    ->name('api.password.email');
 
 Route::post('/login', [TokenController::class, 'store'])
     ->middleware('throttle:6,1')
